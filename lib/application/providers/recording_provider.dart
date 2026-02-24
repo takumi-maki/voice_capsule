@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../infrastructure/repositories/audio_recorder_repository_impl.dart';
 import '../../domain/entities/recording.dart';
 import 'recording_list_provider.dart';
+import 'child_profile_provider.dart';
 
 enum RecordingState { idle, recording, stopped }
 
@@ -43,17 +44,21 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
   Future<void> saveRecording(
     WidgetRef ref,
-    CharacterType character,
-    BackgroundType background,
+    String title,
+    BackgroundType location,
   ) async {
     if (_currentFilePath == null) return;
+
+    final childProfile = ref.read(childProfileProvider);
+    if (childProfile == null) return;
 
     final recording = Recording(
       id: const Uuid().v4(),
       filePath: _currentFilePath!,
       createdAt: DateTime.now(),
-      character: character,
-      background: background,
+      title: title,
+      location: location,
+      childId: childProfile.id,
       duration: 0,
     );
 
@@ -77,5 +82,5 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
 final recordingProvider =
     StateNotifierProvider<RecordingNotifier, RecordingState>((ref) {
-  return RecordingNotifier(AudioRecorderRepositoryImpl());
-});
+      return RecordingNotifier(AudioRecorderRepositoryImpl());
+    });

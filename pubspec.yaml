@@ -1,5 +1,5 @@
 name: voice_capsule
-description: "A new Flutter project."
+description: 'A new Flutter project.'
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -31,25 +31,28 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  
+
   # 状態管理
   flutter_riverpod: ^2.5.1
-  
+
   # 音声
   record: ^6.2.0
   just_audio: ^0.9.40
-  
+
   # ファイル・パス
   path_provider: ^2.1.4
-  
+
   # データ管理
   shared_preferences: ^2.3.2
   uuid: ^4.5.1
   intl: ^0.19.0
-  
+
   # 共有・パーミッション
   share_plus: ^10.1.2
   permission_handler: ^11.3.1
+
+  # 画像選択
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:
@@ -67,7 +70,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
