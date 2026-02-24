@@ -57,12 +57,13 @@ Local Storage
 
 ### F03 音量反応アニメーション
 
-* 再生中の音量取得（RMS）
-* 閾値超過でキャラ状態変更
+* 再生中に口パクアニメループ
+* シンプルなスケール変化
 
-  * Neutral
-  * Talking
-  * Bounce
+  * Playing → 口パクループ
+  * Stopped → Neutral
+
+⚠️ RMS連動は実装困難のため見送り
 
 ### F04 一覧表示
 
@@ -225,10 +226,11 @@ Stopped
 #### アニメロジック
 
 ```
-if (rms < 0.02) → Neutral
-if (0.02 <= rms < 0.1) → Talking
-if (rms >= 0.1) → Bounce
+if (isPlaying) → 口パクループ
+if (!isPlaying) → Neutral
 ```
+
+⚠️ RMS連動は実装困難のためシンプルなループで実装
 
 ---
 
