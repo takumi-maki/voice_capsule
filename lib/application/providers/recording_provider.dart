@@ -60,6 +60,14 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     await ref.read(recordingListProvider.notifier).addRecording(recording);
   }
 
+  Future<void> resetRecording() async {
+    if (state == RecordingState.recording) {
+      await _repository.stopRecording();
+    }
+    _currentFilePath = null;
+    state = RecordingState.idle;
+  }
+
   @override
   void dispose() {
     _repository.dispose();
