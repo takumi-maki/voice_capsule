@@ -138,6 +138,7 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
 
     final recordingNotifier = ref.read(recordingProvider.notifier);
     await recordingNotifier.saveRecording(ref, title, _selectedLocation);
+    await recordingNotifier.resetRecording();
 
     if (mounted) {
       ScaffoldMessenger.of(
