@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
-import '../../../../application/providers/audio_player_provider.dart';
 
 class RecordingButton extends ConsumerWidget {
   const RecordingButton({super.key});
@@ -56,10 +55,7 @@ class RecordingButton extends ConsumerWidget {
         final filePath = await recordingNotifier.stopRecording();
         timerNotifier.stop();
 
-        if (filePath != null) {
-          final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-          await audioPlayerNotifier.play(filePath);
-        } else {
+        if (filePath == null) {
           _showErrorDialog(ref);
         }
         break;

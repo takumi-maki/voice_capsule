@@ -18,9 +18,7 @@ class RecordingScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     final isPlaybackMode =
-        audioPlayerState.isPlaying ||
-        (recordingState == RecordingState.stopped &&
-            audioPlayerState.duration.inMilliseconds > 0);
+        audioPlayerState.isPlaying || recordingState == RecordingState.stopped;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Record Voice')),
