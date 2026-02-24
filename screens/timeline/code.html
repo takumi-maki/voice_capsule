@@ -1,0 +1,195 @@
+<html lang="en"><head><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="font-sans">```html
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Refined Voice Timeline</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F4A261",
+                        "background": "#FFF8F3",
+                        "accent": "#E9C46A",
+                        "text-main": "#2A2A2A",
+                    },
+                    fontFamily: {
+                        "sans": ["Spline Sans", "ui-sans-serif", "system-ui"],
+                    },
+                    borderRadius: {
+                        "card": "16px",
+                        "button": "24px",
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 12px rgba(42, 42, 42, 0.04), 0 2px 4px rgba(42, 42, 42, 0.02)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                min-height: 100dvh;
+                @apply bg-background text-text-main antialiased;
+            }
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 44px;top: 24px;
+            bottom: 0;
+            width: 2px;
+            @apply bg-[#F4A261]/10;
+        }
+    </style>
+
+
+<div class="relative flex min-h-screen w-full max-w-[430px] mx-auto flex-col bg-background shadow-2xl overflow-x-hidden">
+<header class="sticky top-0 z-30 bg-background/90 ios-blur px-6 py-4 flex items-center justify-between border-b border-[#F4A261]/10">
+<button class="size-10 flex items-center justify-center rounded-full bg-white shadow-soft text-text-main">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+<div class="text-center">
+<h1 class="text-[17px] font-bold tracking-tight text-text-main">Voice Timeline</h1>
+<span class="text-[9px] font-bold uppercase tracking-[0.15em] text-primary">VoiceCapsule</span>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined fill-1 text-2xl">account_circle</span>
+</button>
+</header>
+<main class="flex-1 pb-32">
+<div class="px-6 pt-6 pb-4">
+<div class="bg-white rounded-card p-4 flex items-center justify-between shadow-soft border border-[#F4A261]/5">
+<div class="flex items-center gap-3">
+<div class="size-9 rounded-full bg-background flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">database</span>
+</div>
+<div>
+<p class="text-[13px] font-bold text-text-main">Free Version</p>
+<p class="text-[11px] text-text-main/70 font-medium leading-none">3 of 3 recordings used</p>
+</div>
+</div>
+<button class="bg-primary text-white text-[12px] font-bold h-10 px-5 rounded-button shadow-lg shadow-primary/20">Upgrade</button>
+</div>
+</div>
+<div class="relative px-6 py-4 flex flex-col gap-4 timeline-line">
+<div class="relative grid grid-cols-[40px_1fr] gap-4">
+<div class="z-10 flex flex-col items-center">
+<div class="size-10 rounded-full bg-accent flex items-center justify-center border-4 border-background shadow-soft">
+<span class="material-symbols-outlined text-white text-2xl fill-1">face_6</span>
+</div>
+</div>
+<div class="bg-white rounded-card shadow-soft border border-[#F4A261]/5 overflow-hidden active:scale-[0.98] transition-transform">
+<div class="relative aspect-[16/7] w-full bg-[#F4A261]/5">
+<div class="absolute inset-0 bg-cover bg-center opacity-90" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBPu0IU8vj_pbOHLjGU0gkBctTX47OPS7eBWFkRPl2Cs5EmPfnqtXxyIC0flJnLyO4cHL0OY0wnye9NvQJEedoOxQBaKUCKVOoriYuvWssL7JZIYHx9k0rWzbBufGGX16cxlzsJMuNGAj3K1LGtuv8Syjn49PCYbUDtrQBO7HE69UnvSJ5wz7aixbN-_mTbOXmH8SbI0qv8o5vCtluQkerG59EZZV9NDWRpuq9ZN8kqa1GoYMOUODokNKq5QDj0FR17E7FYBFqBRsA');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute top-3 left-3 px-2.5 py-1 bg-white/95 rounded-lg shadow-soft flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-accent fill-1">home_pin</span>
+<span class="text-[10px] font-bold text-text-main uppercase tracking-wider">Home</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-[15px] font-bold text-text-main">Father's Night Story</h3>
+<button class="text-text-main/20"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<p class="text-[11px] font-medium text-text-main/50 mb-4">Oct 24 • 6:30 PM • 02:15</p>
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-white h-12 rounded-button font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined fill-1 text-[20px]">play_circle</span>
+<span>Listen Now</span>
+</button>
+</div>
+</div>
+</div>
+<div class="relative grid grid-cols-[40px_1fr] gap-4">
+<div class="z-10 flex flex-col items-center">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center border-4 border-background shadow-soft">
+<span class="material-symbols-outlined text-white text-2xl fill-1">face_3</span>
+</div>
+</div>
+<div class="bg-white rounded-card shadow-soft border border-[#F4A261]/5 overflow-hidden active:scale-[0.98] transition-transform">
+<div class="relative aspect-[16/7] w-full bg-[#F4A261]/5">
+<div class="absolute inset-0 bg-cover bg-center opacity-90" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCW7n1iTyAafJC1Bc20rqSEyBxbrsbNP_Yb6Yy5ZS6RVz4oLn_8tVZ9WnuzAZQ0V8El5SoFWCeMUfUA2Ql4hXUmjHeeHT_dG5LRePN0Zv8fXJCdW0O2OneLFmluJOVII5_DlnPcMSLRuFgt5ijmy53XX_LBHkbsnBB6xwgiLv19yRLY0zlPC2DsvBSrem_UOZro7SlaXSoO7toA4KqJ82FoUtTy-FnYEffEXPZHy8yT18CXeRhjuC4MZHykgT_a7L4WCR5fAjxgEjU');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute top-3 left-3 px-2.5 py-1 bg-white/95 rounded-lg shadow-soft flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary fill-1">commute</span>
+<span class="text-[10px] font-bold text-text-main uppercase tracking-wider">On the Go</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-[15px] font-bold text-text-main">Mother Singing</h3>
+<button class="text-text-main/20"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<p class="text-[11px] font-medium text-text-main/50 mb-4">Oct 22 • 8:15 AM • 01:45</p>
+<button class="w-full flex items-center justify-center gap-2 bg-background border border-primary/20 text-primary h-12 rounded-button font-bold">
+<span class="material-symbols-outlined fill-1 text-[20px]">play_circle</span>
+<span>Listen Now</span>
+</button>
+</div>
+</div>
+</div>
+<div class="relative grid grid-cols-[40px_1fr] gap-4">
+<div class="z-10 flex flex-col items-center">
+<div class="size-10 rounded-full bg-accent flex items-center justify-center border-4 border-background shadow-soft">
+<span class="material-symbols-outlined text-white text-2xl fill-1">child_care</span>
+</div>
+</div>
+<div class="bg-white rounded-card shadow-soft border border-[#F4A261]/5 overflow-hidden active:scale-[0.98] transition-transform">
+<div class="relative aspect-[16/7] w-full bg-[#F4A261]/5">
+<div class="absolute inset-0 bg-cover bg-center opacity-90" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDftHN4wDHM1syZ6pCxyLKd_qoE6AEmG-6SsrYjQw1r-vBfTg0Qs0a-AdZXOhAUTOAyKRMGycXdhQ2GQ4x8NqXZvgphzMmSn0LaBM5j9939R4h5vZlZwfZxWrS-ivBr_evfxoLhFmzG4UeJKtSvgzyHNcz0fCWcmUwAzEeUOFD2ulw_eeq-spXcZT9-l072kGVe0kdZnwGuLAOEMgeRHzXOC9HP3huN02B52wp91gpPUFrI3sAopZJpCObkbUvj8cwcvL_Z19NVxpU');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<div class="absolute top-3 left-3 px-2.5 py-1 bg-white/95 rounded-lg shadow-soft flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-accent fill-1">park</span>
+<span class="text-[10px] font-bold text-text-main uppercase tracking-wider">Outdoor</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-[15px] font-bold text-text-main">Son at Play</h3>
+<button class="text-text-main/20"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<p class="text-[11px] font-medium text-text-main/50 mb-4">Oct 20 • 3:00 PM • 00:30</p>
+<button class="w-full flex items-center justify-center gap-2 bg-background border border-primary/20 text-primary h-12 rounded-button font-bold">
+<span class="material-symbols-outlined fill-1 text-[20px]">play_circle</span>
+<span>Listen Now</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/95 ios-blur border-t border-[#F4A261]/10 px-8 pt-3 pb-8 flex justify-between items-center z-40">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[26px] fill-1">auto_awesome_motion</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Timeline</span>
+</a>
+<div class="relative -top-6">
+<button class="size-14 rounded-full bg-primary text-white shadow-xl shadow-primary/30 flex items-center justify-center border-[4px] border-white">
+<span class="material-symbols-outlined text-[32px] fill-1">mic</span>
+</button>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-[0.1em] text-text-main/40">Record</span>
+</div>
+<a class="flex flex-col items-center gap-1 text-text-main/30" href="#">
+<span class="material-symbols-outlined text-[26px]">library_music</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Library</span>
+</a>
+</nav>
+</div>
+
+```</body></html>

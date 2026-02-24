@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VoiceCapsule - Background Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F4A261",
+                        "background": "#FFF8F3",
+                        "accent": "#E9C46A",
+                        "custom-text": "#2A2A2A",
+                    },
+                    fontFamily: {
+                        "sans": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "card": "16px",
+                        "button": "24px",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans text-custom-text antialiased bg-background;
+            }
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .active-ring {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #F4A261;
+        }
+        .ios-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col">
+<div class="h-12 w-full"></div>
+<header class="flex items-center justify-between px-6 py-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white soft-shadow active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-custom-text">arrow_back_ios_new</span>
+</button>
+<div class="text-center">
+<h1 class="text-[13px] font-bold tracking-tight text-custom-text/40 uppercase">Environment</h1>
+<p class="text-xs font-semibold text-primary">Step 2 of 3</p>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white soft-shadow">
+<span class="material-symbols-outlined text-[20px] text-custom-text">help_outline</span>
+</button>
+</header>
+<main class="flex-1 px-6 pt-4 pb-32">
+<div class="mb-8">
+<h2 class="text-2xl font-bold tracking-tight">Choose a scene</h2>
+<p class="text-custom-text/60 mt-1 text-sm">Where does this memory live?</p>
+</div>
+<section class="grid grid-cols-3 gap-4 mb-10">
+<button class="flex flex-col items-center gap-3">
+<div class="relative w-full aspect-square rounded-card bg-white p-1 soft-shadow overflow-hidden group">
+<div class="w-full h-full rounded-[12px] bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9HsuaOc6LU-RZMhCnOOsDw2viBiGX_PDt4DlwYt-MuNOR2CmcWJ-HauABHJi_XRWB-9B9HDRclpIumfPqU281PBpwXedF1Tp9Lf12TgtVrje7yjsQNTO53GDc9ZJ3d4BNVfV3enJKYnSywYFnvNxWVkm_NSs4vH_Dl4Kuyar98ySrovkzOn37O3yy2_qiiFHVizFaQCQpIT1JVLe1PWFNFksz9YZxcniMDPbkUwQ26ZuCZXtDrj0Fch5SQzUZfemyDSKfBl_X6Ks')"></div>
+</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-custom-text/40">House</span>
+</button>
+<button class="flex flex-col items-center gap-3">
+<div class="relative w-full aspect-square rounded-card bg-white p-1 soft-shadow overflow-hidden group">
+<div class="w-full h-full rounded-[12px] bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCcLNX1U1Qk92ygjtJAOAIpCiTP7lGd8KOLtbpM8U2a9mKsxLx_2J5gK9zDPQKKhb7Ce0HO2zaou946ZSmlXuJkdwDxQq3DorJ_j5xS5B1rXJm-6PAQjNrFvVwVwO0LvkB4eDWbXPxX5xAncj3h73JSl-7kYWW2kTP5i1Fg--M7jfPzl11JRk4AMrpKhyPBj7UWNHPYe6rElg0DmG2h-Z04FTGYRe9Se8D1iORD4eHOrdn2rgfucWZTQkxtM9JcVLvbbutJFtNnGFI')"></div>
+</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-custom-text/40">Car</span>
+</button>
+<button class="flex flex-col items-center gap-3">
+<div class="relative w-full aspect-square rounded-card bg-white p-1 soft-shadow overflow-hidden active-ring">
+<div class="w-full h-full rounded-[12px] bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBtfj_NZGXCXs9rf45laLinsi9iM-qsYGw1hmWBdkl3iAVphs0CvXHt6BF6a28do1FRAaPpxV9wf3633R1Wrf4roeKP-rQLxlldJPqv_SMTCzwC8prNZAyjXM1C5oMvGc6sOczNN6S3SJN4X7H1Lj807NVf9ZpfbdXp5LYEZTjhngC-kKnTgzVaMjAQzA4puLxiUu_UU4uxMA0N5P08Q5kSFKHPtocDd8YLmyJ2cNarmGANfbic8P8H1HVAlwHhnMKSGXiWTiXC0mY')"></div>
+<div class="absolute top-2 right-2 bg-primary rounded-full size-5 flex items-center justify-center border-2 border-white shadow-sm">
+<span class="material-symbols-outlined text-[12px] text-white font-black">check</span>
+</div>
+</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-primary">Park</span>
+</button>
+</section>
+<section>
+<div class="relative w-full aspect-[4/3] rounded-[24px] overflow-hidden soft-shadow bg-accent/10 border-4 border-white">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA_3-MnQBbOMQH4DiDnPrXdpWpEG6Ghv10yfYcDS5RzvnwGsJtaMZYhgptcjs1f_6hcjGyv900Uvh_OMEgE0Q5xWciCXClH4W_2gV6wyh4pXAQI9FapUXGEhbmcijNv8GGyX1Wt-ltKupEhwoKVqLazkcpHHyXzothOO75dAoWRDckILmTAGG9vJcbI7uTYSVGe7cnfaS9tlAYNKEFa_NsRcNHztQ1QySkk5NElV2KE5hTjhC4L66cyEukvZS_VuNyOtrCuZ0jbd94')"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative">
+<div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-16 h-3 bg-black/10 blur-xl rounded-full"></div>
+<div class="relative text-[64px] leading-none">👦</div>
+</div>
+</div>
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 ios-blur bg-white/60 px-4 py-1.5 rounded-full border border-white/50 shadow-sm">
+<span class="text-[10px] font-bold uppercase tracking-widest text-custom-text/60">Preview Mode</span>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-background/80 ios-blur px-6 pt-6 pb-10 border-t border-black/5">
+<button class="w-full bg-primary h-[48px] rounded-button text-white font-bold text-sm shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            Confirm Selection
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+<div class="mt-6 flex justify-center">
+<div class="w-32 h-1.5 bg-custom-text/10 rounded-full"></div>
+</div>
+</div>
+
+</body></html>

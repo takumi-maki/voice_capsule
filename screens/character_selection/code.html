@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F4A261",
+                        "background": "#FFF8F3",
+                        "accent": "#E9C46A",
+                        "text-main": "#2A2A2A",
+                    },
+                    fontFamily: {
+                        "sans": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "card": "16px",
+                        "button": "24px",
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        'card': '0 2px 8px rgba(0, 0, 0, 0.04)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background font-sans text-text-main;
+                min-height: 100dvh;
+            }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased">
+<div class="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto bg-background">
+<div class="h-12 w-full"></div>
+<div class="flex items-center px-6 py-2">
+<button class="text-text-main flex size-10 shrink-0 items-center justify-start rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios</span>
+</button>
+<h2 class="text-text-main text-base font-semibold flex-1 text-center pr-10">Unified Character Selection V2</h2>
+</div>
+<div class="px-6 pt-6 pb-2">
+<h1 class="text-2xl font-bold text-text-main">Pick a Voice</h1>
+<p class="text-text-main/60 text-sm mt-1">Choose your capsule's storyteller</p>
+</div>
+<div class="w-full overflow-x-auto no-scrollbar px-6 py-4">
+<div class="flex flex-row items-start justify-start gap-3">
+<div class="flex flex-col items-center gap-2 w-20 shrink-0">
+<div class="w-20 h-20 rounded-card bg-white shadow-soft ring-2 ring-primary p-1.5 overflow-hidden">
+<div class="w-full h-full rounded-[10px] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3U4uoMyGY7VB0XF_R7Pk4TEuzvWLHKwuNkoej8UBRergxPC_doB6Erpl-k32bCe70aDZMtmQE3n9qN280xHC73ZlqvVLSPwQN90NxmOy3gDVGTa2EnTvHogIkOxgdsMIxTPD8i-Lr1J6xmbtGQdFpwknKaFvXdl71JJ-srDI7-8z1g8xKbYqysCzIn5gOCA6-6VnvlHX7CFXwK7QnNZx3hN7R13-XIfAIEereA4HsWDOtvXo7qvJgtVLBWF1bh8Fg7wS9bzSMh3E");'></div>
+</div>
+<p class="text-primary text-[10px] font-bold uppercase tracking-wider">Father</p>
+</div>
+<div class="flex flex-col items-center gap-2 w-20 shrink-0 opacity-50">
+<div class="w-20 h-20 rounded-card bg-white shadow-card border border-black/5 p-1.5 overflow-hidden">
+<div class="w-full h-full rounded-[10px] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDIJLxFTJjoNMOrm4oBVtwaXK6kELtForpIM0iLa-WcmRtOAom3yVQ_mSsbgq38GJV7x3OvjeUkyyIWOcBWVjGhKHEfrstSeW_fBfLLnOCn5-ydfEJ-dq_LglcOPJh1RrVR3PRRe6P3hMLtszFTG2ym7Mbe0EpQfUeQoEAdCpQYnim8kkQnUgKSGwonb4bXzNqcZ_pU6Am7w5D8dc2BScJWYppkv1AjrzR1cn1wb_M3lhJfmtBnONSwvG0QRMCjIXhz39psXIf1tK8");'></div>
+</div>
+<p class="text-text-main text-[10px] font-bold uppercase tracking-wider">Mother</p>
+</div>
+<div class="flex flex-col items-center gap-2 w-20 shrink-0 opacity-50">
+<div class="w-20 h-20 rounded-card bg-white shadow-card border border-black/5 p-1.5 overflow-hidden">
+<div class="w-full h-full rounded-[10px] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDs-3KjGLJyp3dBxFn9xvzNYwRQBvT_vpE78R4ao12IVA1tb6TdH71uWhm3aHM0MG1A13Mjwgdq3dR4gZaG2DJS5mr9k36KfvZi09hzZGloNuvQBAcXPKasB3Bix1RMcDWNtq-gZ9bjfCS_tHOlACm0rqJR1zFtHMZoDcUXeedtnnADLm1S5hDB3t6JgA5kGCUl5NrpXgE0vRuULyqCwrn0q5H0NI9jncSgVNWYcaOR77mI6H7BL2rDglAKXZxH4JPN8qgMQEAKQuQ");'></div>
+</div>
+<p class="text-text-main text-[10px] font-bold uppercase tracking-wider">Son</p>
+</div>
+<div class="flex flex-col items-center gap-2 w-20 shrink-0 opacity-50">
+<div class="w-20 h-20 rounded-card bg-white shadow-card border border-black/5 p-1.5 overflow-hidden">
+<div class="w-full h-full rounded-[10px] bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBU4oJt2mgFOhhVsyY7wGFWLodaZ4lSGC3zmHrNRmaAyaNbtENxtdyTqpA1X6wMwCAK0GNiUmuVIaclxSfZNxJczaxP2NNRvQAL8UFdjg1MHaBAs7uipeeDhEBZ_tHKWtelF2--7FfvRVnM5uojQ7428JAPlhUVL6jk8mPxfR36aLYH5lKeyttvocYSzR0m23YYR9kR7BLkvlB_ApPA0eWoomEjAHFU61EFqdiVGV3dqiww-bbyGRxyE2hTrfWi3j-xOTT8enRHzKc");'></div>
+</div>
+<p class="text-text-main text-[10px] font-bold uppercase tracking-wider">Daughter</p>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center px-6 relative">
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+<div class="absolute w-[300px] h-[300px] bg-accent/10 rounded-full"></div>
+<div class="absolute w-[220px] h-[220px] bg-primary/5 rounded-full"></div>
+</div>
+<div class="relative z-10 w-full max-w-[240px] aspect-square flex items-center justify-center">
+<div class="relative w-full h-full rounded-full bg-white p-2 shadow-soft ring-4 ring-white">
+<div class="w-full h-full rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBVne0R_LFhr17XaVRTdWTV0LtTNzejLznNEtf5USDFlPpb3KbtrETJIS5Q__3XoegKzD6sTmozRFMGqMdiOmt_zsyLyco8nV26MwpR8k5NqQh9cXWYUzVST4JuPJYrNTTSdAbfZvNciOrsHgjKkU3LZqJRA2Q0netHTPYjSeWSv3CtyaiTTLJWI4T2_EjEtBhio69tqOHAMbMWdNQy8PvVuQW6-EOFfwzie-wcWvk2dWZFRgq4dLGyhy4YDsEgmGFz4K8fX8-IFhw");'></div>
+</div>
+</div>
+<div class="relative z-10 mt-8 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-accent/20 rounded-full mb-3">
+<span class="material-symbols-outlined text-[16px] text-primary fill-1">stars</span>
+<span class="text-[10px] font-bold text-text-main uppercase tracking-widest">Premium Voice</span>
+</div>
+<h3 class="text-2xl font-bold text-text-main">Father</h3>
+<p class="text-text-main/60 mt-2 text-sm leading-relaxed max-w-[240px] mx-auto">
+                    A warm, comforting tone perfect for bedtime stories and morning wisdom.
+                </p>
+</div>
+</div>
+<div class="px-6 pb-12 pt-4 flex flex-col items-center gap-6">
+<button class="w-full bg-primary text-white font-bold h-[48px] rounded-button shadow-soft transition-opacity active:opacity-90 flex items-center justify-center gap-2">
+<span>Save</span>
+</button>
+<div class="flex flex-col items-center gap-4">
+<p class="text-text-main/30 text-[10px] font-bold tracking-[0.05em] uppercase">
+                    Avatar can be updated in settings
+                </p>
+<div class="w-32 h-1 bg-text-main/10 rounded-full mt-2"></div>
+</div>
+</div>
+</div>
+
+</body></html>
