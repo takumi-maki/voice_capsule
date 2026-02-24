@@ -46,20 +46,30 @@ class RecordingButton extends ConsumerWidget {
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final timerNotifier = ref.read(recordingTimerProvider.notifier);
 
+    print('🔘 RecordingButton: タップ (state = $recordingState)');
+
     switch (recordingState) {
       case RecordingState.idle:
+        print('🔘 RecordingButton: 録音開始処理');
         await recordingNotifier.startRecording();
         timerNotifier.start();
+        print('🔘 RecordingButton: タイマー開始');
         break;
       case RecordingState.recording:
+        print('🔘 RecordingButton: 録音停止処理');
         final filePath = await recordingNotifier.stopRecording();
         timerNotifier.stop();
+        print('🔘 RecordingButton: タイマー停止');
 
         if (filePath == null) {
+          print('🔘 RecordingButton: filePath が null - エラーダイアログ表示');
           _showErrorDialog(ref);
+        } else {
+          print('🔘 RecordingButton: 録音成功 - filePath = $filePath');
         }
         break;
       case RecordingState.stopped:
+        print('🔘 RecordingButton: stopped 状態 - 何もしない');
         break;
     }
   }

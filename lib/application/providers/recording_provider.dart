@@ -18,27 +18,48 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
   String? get currentFilePath => _currentFilePath;
 
   Future<void> startRecording() async {
-    if (state == RecordingState.recording) return;
+    print('🎤 startRecording: 開始');
+    if (state == RecordingState.recording) {
+      print('🎤 startRecording: すでに録音中のため終了');
+      return;
+    }
 
+    print('🎤 startRecording: パーミッション確認');
     final hasPermission = await _repository.hasPermission();
+    print('🎤 startRecording: パーミッション = $hasPermission');
     if (!hasPermission) {
+      print('🎤 startRecording: パーミッション要求');
       final granted = await _repository.requestPermission();
-      if (!granted) return;
+      print('🎤 startRecording: パーミッション許可 = $granted');
+      if (!granted) {
+        print('🎤 startRecording: パーミッション拒否のため終了');
+        return;
+      }
     }
 
     final dir = await getApplicationDocumentsDirectory();
     final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
     _currentFilePath = '${dir.path}/recording_$timestamp.aac';
+    print('🎤 startRecording: ファイルパス = $_currentFilePath');
 
+    print('🎤 startRecording: 録音開始');
     await _repository.startRecording(_currentFilePath!);
     state = RecordingState.recording;
+    print('🎤 startRecording: 状態を recording に変更');
   }
 
   Future<String?> stopRecording() async {
-    if (state != RecordingState.recording) return null;
+    print('⏹️ stopRecording: 開始');
+    if (state != RecordingState.recording) {
+      print('⏹️ stopRecording: 録音中ではないため終了 (state = $state)');
+      return null;
+    }
 
+    print('⏹️ stopRecording: 録音停止');
     final path = await _repository.stopRecording();
+    print('⏹️ stopRecording: 保存パス = $path');
     state = RecordingState.stopped;
+    print('⏹️ stopRecording: 状態を stopped に変更');
     return path;
   }
 
@@ -47,10 +68,20 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     String title,
     BackgroundType location,
   ) async {
-    if (_currentFilePath == null) return;
+    print('💾 saveRecording: 開始');
+    print('💾 saveRecording: title = $title, location = $location');
+    if (_currentFilePath == null) {
+      print('💾 saveRecording: _currentFilePath が null のため終了');
+      return;
+    }
+    print('💾 saveRecording: _currentFilePath = $_currentFilePath');
 
     final childProfile = ref.read(childProfileProvider);
-    if (childProfile == null) return;
+    print('💾 saveRecording: childProfile = $childProfile');
+    if (childProfile == null) {
+      print('💾 saveRecording: childProfile が null のため終了');
+      return;
+    }
 
     final recording = Recording(
       id: const Uuid().v4(),
@@ -61,16 +92,22 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
       childId: childProfile.id,
       duration: 0,
     );
+    print('💾 saveRecording: Recording作成 = ${recording.id}');
 
+    print('💾 saveRecording: recordingListProviderに追加');
     await ref.read(recordingListProvider.notifier).addRecording(recording);
+    print('💾 saveRecording: 完了');
   }
 
   Future<void> resetRecording() async {
+    print('🔄 resetRecording: 開始 (state = $state)');
     if (state == RecordingState.recording) {
+      print('🔄 resetRecording: 録音中のため停止');
       await _repository.stopRecording();
     }
     _currentFilePath = null;
     state = RecordingState.idle;
+    print('🔄 resetRecording: 状態を idle に変更');
   }
 
   @override
