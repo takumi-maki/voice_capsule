@@ -168,6 +168,12 @@ class _ChildProfileSetupScreenState
       setState(() {
         _photoPath = path;
       });
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('カメラへのアクセスに失敗しました。設定から権限を許可してください。')),
+        );
+      }
     }
   }
 
@@ -179,6 +185,12 @@ class _ChildProfileSetupScreenState
       setState(() {
         _photoPath = path;
       });
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ギャラリーへのアクセスに失敗しました。設定から権限を許可してください。')),
+        );
+      }
     }
   }
 
