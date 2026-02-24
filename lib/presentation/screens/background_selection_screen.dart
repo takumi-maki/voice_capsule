@@ -9,16 +9,15 @@ class BackgroundSelectionScreen extends StatefulWidget {
       _BackgroundSelectionScreenState();
 }
 
-class _BackgroundSelectionScreenState
-    extends State<BackgroundSelectionScreen> {
-  BackgroundType _selectedBackground = BackgroundType.house;
+class _BackgroundSelectionScreenState extends State<BackgroundSelectionScreen> {
+  BackgroundType _selectedLocation = BackgroundType.house;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pick a Scene'),
-      ),
+      appBar: AppBar(title: const Text('場所を選択')),
       body: Column(
         children: [
           Padding(
@@ -27,10 +26,10 @@ class _BackgroundSelectionScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Choose where this memory was made',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.black54,
-                      ),
+                  'どこで録音しましたか？',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.black54,
+                  ),
                 ),
               ],
             ),
@@ -41,12 +40,15 @@ class _BackgroundSelectionScreenState
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: [
-                _buildBackgroundOption(BackgroundType.house, Icons.home, 'Home'),
+                _buildLocationOption(BackgroundType.house, Icons.home, '家'),
                 const SizedBox(width: 16),
-                _buildBackgroundOption(
-                    BackgroundType.car, Icons.directions_car, 'Car'),
+                _buildLocationOption(
+                  BackgroundType.car,
+                  Icons.directions_car,
+                  '車',
+                ),
                 const SizedBox(width: 16),
-                _buildBackgroundOption(BackgroundType.park, Icons.park, 'Park'),
+                _buildLocationOption(BackgroundType.park, Icons.park, '公園'),
               ],
             ),
           ),
@@ -59,33 +61,39 @@ class _BackgroundSelectionScreenState
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
               ],
             ),
             child: Icon(
-              _getBackgroundIcon(_selectedBackground),
+              _getLocationIcon(_selectedLocation),
               size: 100,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.primary,
             ),
           ),
           const SizedBox(height: 24),
           Text(
-            _selectedBackground.name.toUpperCase(),
-            style: Theme.of(context).textTheme.headlineSmall,
+            _selectedLocation.displayName,
+            style: theme.textTheme.headlineSmall,
           ),
           const Spacer(),
           Padding(
             padding: const EdgeInsets.all(24),
             child: SizedBox(
               width: double.infinity,
+              height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context, _selectedBackground);
+                  Navigator.pop(context, _selectedLocation);
                 },
-                child: const Text('Save'),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                ),
+                child: const Text('決定'),
               ),
             ),
           ),
@@ -94,16 +102,18 @@ class _BackgroundSelectionScreenState
     );
   }
 
-  Widget _buildBackgroundOption(
-    BackgroundType background,
+  Widget _buildLocationOption(
+    BackgroundType location,
     IconData icon,
     String label,
   ) {
-    final isSelected = _selectedBackground == background;
+    final theme = Theme.of(context);
+    final isSelected = _selectedLocation == location;
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedBackground = background;
+          _selectedLocation = location;
         });
       },
       child: Column(
@@ -116,13 +126,13 @@ class _BackgroundSelectionScreenState
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.secondary
+                    ? theme.colorScheme.primary
                     : Colors.transparent,
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -131,9 +141,7 @@ class _BackgroundSelectionScreenState
             child: Icon(
               icon,
               size: 32,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.secondary
-                  : Colors.black38,
+              color: isSelected ? theme.colorScheme.primary : Colors.black38,
             ),
           ),
           const SizedBox(height: 8),
@@ -142,9 +150,7 @@ class _BackgroundSelectionScreenState
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.secondary
-                  : Colors.black38,
+              color: isSelected ? theme.colorScheme.primary : Colors.black38,
             ),
           ),
         ],
@@ -152,8 +158,8 @@ class _BackgroundSelectionScreenState
     );
   }
 
-  IconData _getBackgroundIcon(BackgroundType background) {
-    switch (background) {
+  IconData _getLocationIcon(BackgroundType location) {
+    switch (location) {
       case BackgroundType.house:
         return Icons.home;
       case BackgroundType.car:

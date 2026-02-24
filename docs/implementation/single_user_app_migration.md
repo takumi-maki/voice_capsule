@@ -473,11 +473,11 @@ ListTile(
 
 ## 実装状況
 
-- [ ] Phase 1: 準備
-- [ ] Phase 2: データモデル変更
-- [ ] Phase 3: Infrastructure層
-- [ ] Phase 4: Application層
-- [ ] Phase 5: Presentation層（削除）
-- [ ] Phase 6: Presentation層（新規）
-- [ ] Phase 7: Presentation層（修正）
+- [x] Phase 1: 準備
+- [x] Phase 2: データモデル変更
+- [x] Phase 3: Infrastructure層
+- [x] Phase 4: Application層
+- [x] Phase 5: Presentation層（削除）
+- [x] Phase 6: Presentation層（新規）
+- [x] Phase 7: Presentation層（修正）
 - [ ] Phase 8: テスト・調整
