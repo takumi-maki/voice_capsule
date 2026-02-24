@@ -81,7 +81,11 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   Future<void> stop() async {
     await _repository.stop();
-    state = state.copyWith(isPlaying: false, position: Duration.zero);
+    state = state.copyWith(
+      isPlaying: false,
+      position: Duration.zero,
+      duration: Duration.zero,
+    );
   }
 
   Future<void> seek(Duration position) async {
