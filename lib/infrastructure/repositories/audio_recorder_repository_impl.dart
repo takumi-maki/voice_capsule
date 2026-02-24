@@ -17,16 +17,25 @@ class AudioRecorderRepositoryImpl implements AudioRecorderRepository {
   @override
   Future<void> startRecording(String filePath) async {
     if (await hasPermission()) {
+      print('🎙️ 録音開始: $filePath');
       await _recorder.start(
-        const RecordConfig(encoder: AudioEncoder.aacLc),
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 44100,
+        ),
         path: filePath,
       );
+    } else {
+      print('⚠️ マイク権限がありません');
     }
   }
 
   @override
   Future<String?> stopRecording() async {
-    return await _recorder.stop();
+    final path = await _recorder.stop();
+    print('⏹️ 録音停止: $path');
+    return path;
   }
 
   @override

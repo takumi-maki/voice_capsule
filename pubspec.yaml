@@ -36,7 +36,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   
   # 音声
-  record: ^5.1.0
+  record: ^6.2.0
   just_audio: ^0.9.40
   
   # ファイル・パス
