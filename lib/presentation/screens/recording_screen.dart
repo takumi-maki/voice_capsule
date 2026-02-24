@@ -62,8 +62,10 @@ class RecordingScreen extends ConsumerWidget {
               ),
             ),
             if (recordingState == RecordingState.stopped &&
-                recordingNotifier.currentFilePath != null) ..[
+                recordingNotifier.currentFilePath != null)
               const SizedBox(height: 24),
+            if (recordingState == RecordingState.stopped &&
+                recordingNotifier.currentFilePath != null)
               ElevatedButton.icon(
                 onPressed: () async {
                   await audioPlayerNotifier.play(
@@ -73,7 +75,6 @@ class RecordingScreen extends ConsumerWidget {
                 icon: const Icon(Icons.play_arrow),
                 label: const Text('Play'),
               ),
-            ],
           ],
         ),
       ),
