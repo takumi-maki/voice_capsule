@@ -4,12 +4,22 @@ import '../../application/providers/recording_provider.dart';
 import '../../application/providers/audio_player_provider.dart';
 import '../../domain/entities/recording.dart';
 import 'timeline_screen.dart';
+import 'character_selection_screen.dart';
+import 'background_selection_screen.dart';
 
-class RecordingScreen extends ConsumerWidget {
+class RecordingScreen extends ConsumerStatefulWidget {
   const RecordingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RecordingScreen> createState() => _RecordingScreenState();
+}
+
+class _RecordingScreenState extends ConsumerState<RecordingScreen> {
+  CharacterType _selectedCharacter = CharacterType.son;
+  BackgroundType _selectedBackground = BackgroundType.house;
+
+  @override
+  Widget build(BuildContext context) {
     final recordingState = ref.watch(recordingProvider);
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
@@ -79,12 +89,57 @@ class RecordingScreen extends ConsumerWidget {
               const SizedBox(height: 24),
             if (recordingState == RecordingState.stopped &&
                 recordingNotifier.currentFilePath != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final character = await Navigator.push<CharacterType>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CharacterSelectionScreen(),
+                        ),
+                      );
+                      if (character != null) {
+                        setState(() {
+                          _selectedCharacter = character;
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.person),
+                    label: Text(_selectedCharacter.name),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final background = await Navigator.push<BackgroundType>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const BackgroundSelectionScreen(),
+                        ),
+                      );
+                      if (background != null) {
+                        setState(() {
+                          _selectedBackground = background;
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.place),
+                    label: Text(_selectedBackground.name),
+                  ),
+                ],
+              ),
+            if (recordingState == RecordingState.stopped &&
+                recordingNotifier.currentFilePath != null)
+              const SizedBox(height: 16),
+            if (recordingState == RecordingState.stopped &&
+                recordingNotifier.currentFilePath != null)
               ElevatedButton.icon(
                 onPressed: () async {
                   await recordingNotifier.saveRecording(
                     ref,
-                    CharacterType.son,
-                    BackgroundType.house,
+                    _selectedCharacter,
+                    _selectedBackground,
                   );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
