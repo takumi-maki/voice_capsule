@@ -5,18 +5,28 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
   final AudioPlayer _player = AudioPlayer();
 
   @override
+  Future<void> load(String filePath) async {
+    print('🎵 AudioPlayer: ファイルロード開始 - $filePath');
+    await _player.setFilePath(filePath);
+    print('🎵 AudioPlayer: ファイルロード完了');
+  }
+
+  @override
   Future<void> play(String filePath) async {
+    print('🎵 AudioPlayer: 再生開始 - $filePath');
     await _player.setFilePath(filePath);
     await _player.play();
   }
 
   @override
   Future<void> pause() async {
+    print('🎵 AudioPlayer: pause() 呼び出し');
     await _player.pause();
   }
 
   @override
   Future<void> resume() async {
+    print('🎵 AudioPlayer: resume() 呼び出し');
     await _player.play();
   }
 

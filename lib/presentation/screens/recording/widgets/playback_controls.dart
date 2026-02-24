@@ -117,10 +117,13 @@ class PlaybackControls extends ConsumerWidget {
   }
 
   void _togglePlayPause(WidgetRef ref, bool isPlaying) {
+    print('▶️ PlaybackControls: 再生/一時停止ボタンタップ (isPlaying = $isPlaying)');
     final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
     if (isPlaying) {
+      print('▶️ PlaybackControls: pause() 呼び出し');
       audioPlayerNotifier.pause();
     } else {
+      print('▶️ PlaybackControls: resume() 呼び出し');
       audioPlayerNotifier.resume();
     }
   }
