@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
+import '../../../../application/providers/audio_player_provider.dart';
 
 class WaveformVisualizer extends ConsumerStatefulWidget {
   const WaveformVisualizer({super.key});
@@ -31,10 +32,19 @@ class _WaveformVisualizerState extends ConsumerState<WaveformVisualizer>
   @override
   Widget build(BuildContext context) {
     final recordingState = ref.watch(recordingProvider);
+    final audioPlayerState = ref.watch(audioPlayerProvider);
     final theme = Theme.of(context);
 
     ref.listen(recordingProvider, (previous, next) {
       if (next == RecordingState.recording) {
+        _animationController.repeat();
+      } else {
+        _animationController.stop();
+      }
+    });
+
+    ref.listen(audioPlayerProvider, (previous, next) {
+      if (next.isPlaying) {
         _animationController.repeat();
       } else {
         _animationController.stop();
@@ -51,7 +61,8 @@ class _WaveformVisualizerState extends ConsumerState<WaveformVisualizer>
             children: List.generate(5, (index) {
               final delay = index * 0.2;
               final animationValue = (_animationController.value + delay) % 1.0;
-              final height = recordingState == RecordingState.recording
+              final isActive = recordingState == RecordingState.recording || audioPlayerState.isPlaying;
+              final height = isActive
                   ? 20 + (40 * (0.5 + 0.5 * (animationValue * 2 - 1).abs()))
                   : 20.0;
 

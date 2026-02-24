@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/audio_player_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
+import '../../save_recording_screen.dart';
 
 class RecordingControls extends ConsumerWidget {
   const RecordingControls({super.key});
@@ -97,11 +98,17 @@ class RecordingControls extends ConsumerWidget {
   }
 
   void _saveRecording(BuildContext context, WidgetRef ref) {
-    // TODO: Navigate to save screen with character and background selection
-    // For now, just show a placeholder message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Save functionality coming soon')),
-    );
+    final recordingNotifier = ref.read(recordingProvider.notifier);
+    final filePath = recordingNotifier.currentFilePath;
+    
+    if (filePath != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SaveRecordingScreen(filePath: filePath),
+        ),
+      );
+    }
   }
 
   void _retryRecording(BuildContext context, WidgetRef ref) async {
