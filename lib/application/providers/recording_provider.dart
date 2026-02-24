@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import '../../infrastructure/repositories/audio_recorder_repository_impl.dart';
+import '../../domain/entities/recording.dart';
+import 'recording_list_provider.dart';
 
 enum RecordingState { idle, recording, stopped }
 
@@ -36,6 +39,25 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     final path = await _repository.stopRecording();
     state = RecordingState.stopped;
     return path;
+  }
+
+  Future<void> saveRecording(
+    WidgetRef ref,
+    CharacterType character,
+    BackgroundType background,
+  ) async {
+    if (_currentFilePath == null) return;
+
+    final recording = Recording(
+      id: const Uuid().v4(),
+      filePath: _currentFilePath!,
+      createdAt: DateTime.now(),
+      character: character,
+      background: background,
+      duration: 0,
+    );
+
+    await ref.read(recordingListProvider.notifier).addRecording(recording);
   }
 
   @override

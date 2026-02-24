@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/recording_provider.dart';
 import '../../application/providers/audio_player_provider.dart';
+import '../../domain/entities/recording.dart';
+import 'timeline_screen.dart';
 
 class RecordingScreen extends ConsumerWidget {
   const RecordingScreen({super.key});
@@ -15,6 +17,17 @@ class RecordingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recording'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TimelineScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -68,12 +81,19 @@ class RecordingScreen extends ConsumerWidget {
                 recordingNotifier.currentFilePath != null)
               ElevatedButton.icon(
                 onPressed: () async {
-                  await audioPlayerNotifier.play(
-                    recordingNotifier.currentFilePath!,
+                  await recordingNotifier.saveRecording(
+                    ref,
+                    CharacterType.son,
+                    BackgroundType.house,
                   );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Saved!')),
+                    );
+                  }
                 },
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('Play'),
+                icon: const Icon(Icons.save),
+                label: const Text('Save'),
               ),
           ],
         ),
