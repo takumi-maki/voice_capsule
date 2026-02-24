@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/recording.dart';
 import '../../application/providers/recording_provider.dart';
 import 'background_selection_screen.dart';
-import 'timeline_screen.dart';
+import 'main_screen.dart';
 
 class SaveRecordingScreen extends ConsumerStatefulWidget {
   final String filePath;
@@ -153,7 +153,7 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
       ).showSnackBar(const SnackBar(content: Text('録音を保存しました')));
       Navigator.of(context).popUntil((route) => route.isFirst);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const TimelineScreen()),
+        MaterialPageRoute(builder: (_) => const MainScreen(initialIndex: 1)),
       );
       print('💾 SaveRecordingScreen: 画面遷移完了');
     }

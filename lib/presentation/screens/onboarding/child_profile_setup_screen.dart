@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/child_profile_provider.dart';
 
 class ChildProfileSetupScreen extends ConsumerStatefulWidget {
-  const ChildProfileSetupScreen({super.key});
+  final bool isEditing;
+
+  const ChildProfileSetupScreen({super.key, this.isEditing = false});
 
   @override
   ConsumerState<ChildProfileSetupScreen> createState() =>
