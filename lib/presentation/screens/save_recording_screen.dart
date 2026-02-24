@@ -127,20 +127,27 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
   }
 
   void _saveRecording() async {
+    print('💾 SaveRecordingScreen: 保存ボタンタップ');
     final title = _titleController.text.trim();
+    print('💾 SaveRecordingScreen: title = "$title"');
 
     if (title.isEmpty) {
+      print('💾 SaveRecordingScreen: タイトルが空のためスナックバー表示');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('タイトルを入力してください')));
       return;
     }
 
+    print('💾 SaveRecordingScreen: 保存処理開始');
     final recordingNotifier = ref.read(recordingProvider.notifier);
     await recordingNotifier.saveRecording(ref, title, _selectedLocation);
+    print('💾 SaveRecordingScreen: リセット処理開始');
     await recordingNotifier.resetRecording();
+    print('💾 SaveRecordingScreen: リセット完了');
 
     if (mounted) {
+      print('💾 SaveRecordingScreen: スナックバー表示 & 画面遷移');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('録音を保存しました')));
@@ -148,6 +155,7 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const TimelineScreen()),
       );
+      print('💾 SaveRecordingScreen: 画面遷移完了');
     }
   }
 

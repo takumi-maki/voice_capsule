@@ -126,16 +126,21 @@ class PlaybackControls extends ConsumerWidget {
   }
 
   void _saveRecording(BuildContext context, WidgetRef ref) {
+    print('💾 PlaybackControls: 保存ボタンタップ');
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final filePath = recordingNotifier.currentFilePath;
+    print('💾 PlaybackControls: currentFilePath = $filePath');
 
     if (filePath != null) {
+      print('💾 PlaybackControls: SaveRecordingScreen に遷移');
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => SaveRecordingScreen(filePath: filePath),
         ),
       );
+    } else {
+      print('💾 PlaybackControls: filePath が null のため遷移しない');
     }
   }
 
