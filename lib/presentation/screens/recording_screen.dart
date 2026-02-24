@@ -5,7 +5,6 @@ import '../../application/providers/audio_player_provider.dart';
 import 'recording/widgets/recording_button.dart';
 import 'recording/widgets/recording_timer.dart';
 import 'recording/widgets/waveform_visualizer.dart';
-import 'recording/widgets/recording_controls.dart';
 import 'recording/widgets/playback_progress_bar.dart';
 import 'recording/widgets/playback_controls.dart';
 
@@ -49,11 +48,7 @@ class RecordingScreen extends ConsumerWidget {
                 const RecordingTimer(),
               ],
               const SizedBox(height: 24),
-              if (isPlaybackMode) ...[
-                const PlaybackControls(),
-              ] else ...[
-                const RecordingControls(),
-              ],
+              if (isPlaybackMode) ...[const PlaybackControls()],
               const SizedBox(height: 24),
             ],
           ),

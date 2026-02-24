@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
+import '../../../../application/providers/audio_player_provider.dart';
 
 class RecordingButton extends ConsumerWidget {
   const RecordingButton({super.key});
@@ -52,13 +53,41 @@ class RecordingButton extends ConsumerWidget {
         timerNotifier.start();
         break;
       case RecordingState.recording:
-        await recordingNotifier.stopRecording();
+        final filePath = await recordingNotifier.stopRecording();
         timerNotifier.stop();
+
+        if (filePath != null) {
+          final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
+          await audioPlayerNotifier.play(filePath);
+        } else {
+          _showErrorDialog(ref);
+        }
         break;
       case RecordingState.stopped:
-        timerNotifier.reset();
         break;
     }
+  }
+
+  void _showErrorDialog(WidgetRef ref) async {
+    final context = ref.context;
+    if (!context.mounted) return;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('録音エラー'),
+        content: const Text('録音の保存に失敗しました。もう一度お試しください。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+
+    final recordingNotifier = ref.read(recordingProvider.notifier);
+    await recordingNotifier.resetRecording();
   }
 
   Color _getButtonColor(RecordingState state, ThemeData theme) {
