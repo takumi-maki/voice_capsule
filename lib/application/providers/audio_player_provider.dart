@@ -60,7 +60,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   }
 
   void _onPlaybackCompleted() {
-    state = state.copyWith(isPlaying: false, position: Duration.zero);
+    state = state.copyWith(isPlaying: false);
   }
 
   Future<void> play(String filePath) async {
