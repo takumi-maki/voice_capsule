@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/recording_provider.dart';
+import '../../application/providers/audio_player_provider.dart';
 
 class RecordingScreen extends ConsumerWidget {
   const RecordingScreen({super.key});
@@ -9,6 +10,7 @@ class RecordingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recordingState = ref.watch(recordingProvider);
     final recordingNotifier = ref.read(recordingProvider.notifier);
+    final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,6 +61,19 @@ class RecordingScreen extends ConsumerWidget {
                 style: const TextStyle(fontSize: 18),
               ),
             ),
+            if (recordingState == RecordingState.stopped &&
+                recordingNotifier.currentFilePath != null) ..[
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await audioPlayerNotifier.play(
+                    recordingNotifier.currentFilePath!,
+                  );
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Play'),
+              ),
+            ],
           ],
         ),
       ),
