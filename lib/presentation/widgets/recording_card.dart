@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/recording.dart';
-import '../../application/providers/audio_player_provider.dart';
+import '../screens/playback_screen.dart';
 import 'category_icon.dart';
 
 class RecordingCard extends ConsumerWidget {
@@ -186,7 +186,10 @@ class RecordingCard extends ConsumerWidget {
   }
 
   Future<void> _playRecording(WidgetRef ref) async {
-    final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-    await audioPlayerNotifier.play(recording.filePath);
+    final context = ref.context;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => PlaybackScreen(recording: recording)),
+    );
   }
 }
