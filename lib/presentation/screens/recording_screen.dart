@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/recording_provider.dart';
 import '../../application/providers/audio_player_provider.dart';
+import '../../application/providers/trimming_provider.dart';
 import 'recording/widgets/recording_button.dart';
 import 'recording/widgets/recording_timer.dart';
 import 'recording/widgets/waveform_visualizer.dart';
 import 'recording/widgets/playback_progress_bar.dart';
 import 'recording/widgets/playback_controls.dart';
+import 'recording/widgets/trimming_slider.dart';
 
 class RecordingScreen extends ConsumerWidget {
   const RecordingScreen({super.key});
@@ -46,13 +48,41 @@ class RecordingScreen extends ConsumerWidget {
                 const RecordingTimer(),
               ],
               const SizedBox(height: 24),
-              if (isPlaybackMode) ...[const PlaybackControls()],
+              if (isPlaybackMode) ...[
+                const PlaybackControls(),
+                const SizedBox(height: 24),
+                _buildTrimmingSection(ref, audioPlayerState),
+              ],
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildTrimmingSection(WidgetRef ref, AudioPlayerState audioState) {
+    final trimmingRange = ref.watch(trimmingProvider);
+    final theme = Theme.of(ref.context);
+
+    if (trimmingRange == null && audioState.duration > Duration.zero) {
+      return TextButton.icon(
+        onPressed: () {
+          ref.read(trimmingProvider.notifier).initialize(audioState.duration);
+        },
+        icon: Icon(Icons.content_cut, color: theme.colorScheme.primary),
+        label: Text(
+          'Trim Audio',
+          style: TextStyle(color: theme.colorScheme.primary),
+        ),
+      );
+    }
+
+    if (trimmingRange != null) {
+      return const TrimmingSlider();
+    }
+
+    return const SizedBox.shrink();
   }
 
   String _getStateMessage(
