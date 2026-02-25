@@ -88,8 +88,9 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
   Future<void> saveRecording(
     WidgetRef ref,
     String title,
-    BackgroundType location,
-  ) async {
+    BackgroundType location, {
+    List<String>? childIds,
+  }) async {
     print('💾 saveRecording: 開始');
     print('💾 saveRecording: title = $title, location = $location');
     if (_currentFilePath == null) {
@@ -98,11 +99,17 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     }
     print('💾 saveRecording: _currentFilePath = $_currentFilePath');
 
-    final childProfile = ref.read(childProfileProvider);
-    print('💾 saveRecording: childProfile = $childProfile');
-    if (childProfile == null) {
-      print('💾 saveRecording: childProfile が null のため終了');
-      return;
+    final List<String> ids;
+    if (childIds != null && childIds.isNotEmpty) {
+      ids = childIds;
+    } else {
+      final childProfile = ref.read(childProfileProvider);
+      print('💾 saveRecording: childProfile = $childProfile');
+      if (childProfile == null) {
+        print('💾 saveRecording: childProfile が null のため終了');
+        return;
+      }
+      ids = [childProfile.id];
     }
 
     final recording = Recording(
@@ -111,7 +118,7 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
       createdAt: DateTime.now(),
       title: title,
       location: location,
-      childId: childProfile.id,
+      childIds: ids,
       duration: 0,
     );
     print('💾 saveRecording: Recording作成 = ${recording.id}');

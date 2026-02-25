@@ -34,6 +34,10 @@ class ChildProfileNotifier extends StateNotifier<Child?> {
     state = child;
   }
 
+  Future<List<Child>> getAllProfiles() async {
+    return await _repository.getAllProfiles();
+  }
+
   Future<String?> pickImageFromGallery() async {
     try {
       final XFile? image = await _imagePicker.pickImage(

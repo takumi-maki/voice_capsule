@@ -19,7 +19,7 @@ class Recording {
   final DateTime createdAt;
   final String title;
   final BackgroundType location;
-  final String childId;
+  final List<String> childIds;
   final int duration;
 
   Recording({
@@ -28,7 +28,7 @@ class Recording {
     required this.createdAt,
     required this.title,
     required this.location,
-    required this.childId,
+    required this.childIds,
     required this.duration,
   });
 
@@ -38,17 +38,29 @@ class Recording {
     'createdAt': createdAt.toIso8601String(),
     'title': title,
     'location': location.name,
-    'childId': childId,
+    'childIds': childIds,
     'duration': duration,
   };
 
-  factory Recording.fromJson(Map<String, dynamic> json) => Recording(
-    id: json['id'],
-    filePath: json['filePath'],
-    createdAt: DateTime.parse(json['createdAt']),
-    title: json['title'],
-    location: BackgroundType.values.byName(json['location']),
-    childId: json['childId'],
-    duration: json['duration'],
-  );
+  factory Recording.fromJson(Map<String, dynamic> json) {
+    // 既存データの移行: childId → childIds
+    List<String> ids;
+    if (json.containsKey('childIds')) {
+      ids = List<String>.from(json['childIds']);
+    } else if (json.containsKey('childId')) {
+      ids = [json['childId'] as String];
+    } else {
+      ids = [];
+    }
+
+    return Recording(
+      id: json['id'],
+      filePath: json['filePath'],
+      createdAt: DateTime.parse(json['createdAt']),
+      title: json['title'],
+      location: BackgroundType.values.byName(json['location']),
+      childIds: ids,
+      duration: json['duration'],
+    );
+  }
 }

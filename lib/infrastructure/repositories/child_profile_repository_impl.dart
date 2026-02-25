@@ -7,6 +7,7 @@ import '../../domain/repositories/child_profile_repository.dart';
 
 class ChildProfileRepositoryImpl implements ChildProfileRepository {
   static const String _profileKey = 'child_profile';
+  static const String _allProfilesKey = 'child_profiles';
   static const String _photoFileName = 'photo.jpg';
 
   @override
@@ -25,10 +26,51 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
   }
 
   @override
+  Future<List<Child>> getAllProfiles() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_allProfilesKey);
+
+    if (jsonString == null) {
+      // 既存の単一プロフィールを移行
+      final single = await getProfile();
+      if (single != null) {
+        await _saveAllProfiles([single]);
+        return [single];
+      }
+      return [];
+    }
+
+    try {
+      final List<dynamic> jsonList = jsonDecode(jsonString);
+      return jsonList
+          .map((json) => Child.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
   Future<void> saveProfile(Child child) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = jsonEncode(child.toJson());
     await prefs.setString(_profileKey, jsonString);
+
+    // リストにも追加/更新
+    final profiles = await getAllProfiles();
+    final index = profiles.indexWhere((p) => p.id == child.id);
+    if (index >= 0) {
+      profiles[index] = child;
+    } else {
+      profiles.add(child);
+    }
+    await _saveAllProfiles(profiles);
+  }
+
+  Future<void> _saveAllProfiles(List<Child> profiles) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = profiles.map((p) => p.toJson()).toList();
+    await prefs.setString(_allProfilesKey, jsonEncode(jsonList));
   }
 
   @override
