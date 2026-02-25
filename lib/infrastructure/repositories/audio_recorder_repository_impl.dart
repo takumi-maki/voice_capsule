@@ -39,8 +39,25 @@ class AudioRecorderRepositoryImpl implements AudioRecorderRepository {
   }
 
   @override
+  Future<void> pauseRecording() async {
+    await _recorder.pause();
+    print('⏸️ 録音一時停止');
+  }
+
+  @override
+  Future<void> resumeRecording() async {
+    await _recorder.resume();
+    print('▶️ 録音再開');
+  }
+
+  @override
   Future<bool> isRecording() async {
     return await _recorder.isRecording();
+  }
+
+  @override
+  Future<bool> isPaused() async {
+    return await _recorder.isPaused();
   }
 
   void dispose() {

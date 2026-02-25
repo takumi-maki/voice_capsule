@@ -7,7 +7,7 @@ import '../../domain/entities/recording.dart';
 import 'recording_list_provider.dart';
 import 'child_profile_provider.dart';
 
-enum RecordingState { idle, recording, stopped }
+enum RecordingState { idle, recording, paused, stopped }
 
 class RecordingNotifier extends StateNotifier<RecordingState> {
   final AudioRecorderRepositoryImpl _repository;
@@ -50,8 +50,8 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
   Future<String?> stopRecording() async {
     print('⏹️ stopRecording: 開始');
-    if (state != RecordingState.recording) {
-      print('⏹️ stopRecording: 録音中ではないため終了 (state = $state)');
+    if (state != RecordingState.recording && state != RecordingState.paused) {
+      print('⏹️ stopRecording: 録音中/一時停止中ではないため終了 (state = $state)');
       return null;
     }
 
@@ -61,6 +61,28 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     state = RecordingState.stopped;
     print('⏹️ stopRecording: 状態を stopped に変更');
     return path;
+  }
+
+  Future<void> pauseRecording() async {
+    print('⏸️ pauseRecording: 開始');
+    if (state != RecordingState.recording) {
+      print('⏸️ pauseRecording: 録音中ではないため終了 (state = $state)');
+      return;
+    }
+    await _repository.pauseRecording();
+    state = RecordingState.paused;
+    print('⏸️ pauseRecording: 状態を paused に変更');
+  }
+
+  Future<void> resumeRecording() async {
+    print('▶️ resumeRecording: 開始');
+    if (state != RecordingState.paused) {
+      print('▶️ resumeRecording: 一時停止中ではないため終了 (state = $state)');
+      return;
+    }
+    await _repository.resumeRecording();
+    state = RecordingState.recording;
+    print('▶️ resumeRecording: 状態を recording に変更');
   }
 
   Future<void> saveRecording(
@@ -101,8 +123,8 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
   Future<void> resetRecording() async {
     print('🔄 resetRecording: 開始 (state = $state)');
-    if (state == RecordingState.recording) {
-      print('🔄 resetRecording: 録音中のため停止');
+    if (state == RecordingState.recording || state == RecordingState.paused) {
+      print('🔄 resetRecording: 録音中/一時停止中のため停止');
       await _repository.stopRecording();
     }
     _currentFilePath = null;

@@ -61,7 +61,9 @@ class _WaveformVisualizerState extends ConsumerState<WaveformVisualizer>
             children: List.generate(5, (index) {
               final delay = index * 0.2;
               final animationValue = (_animationController.value + delay) % 1.0;
-              final isActive = recordingState == RecordingState.recording || audioPlayerState.isPlaying;
+              final isActive =
+                  recordingState == RecordingState.recording ||
+                  audioPlayerState.isPlaying;
               final height = isActive
                   ? 20 + (40 * (0.5 + 0.5 * (animationValue * 2 - 1).abs()))
                   : 20.0;

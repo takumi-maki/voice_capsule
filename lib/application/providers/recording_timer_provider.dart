@@ -18,6 +18,17 @@ class RecordingTimerNotifier extends StateNotifier<Duration> {
     _timer?.cancel();
   }
 
+  void pause() {
+    _timer?.cancel();
+  }
+
+  void resume() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      state = Duration(seconds: state.inSeconds + 1);
+    });
+  }
+
   void reset() {
     _timer?.cancel();
     state = Duration.zero;
@@ -32,5 +43,5 @@ class RecordingTimerNotifier extends StateNotifier<Duration> {
 
 final recordingTimerProvider =
     StateNotifierProvider<RecordingTimerNotifier, Duration>((ref) {
-  return RecordingTimerNotifier();
-});
+      return RecordingTimerNotifier();
+    });

@@ -12,33 +12,80 @@ class RecordingButton extends ConsumerWidget {
     final recordingState = ref.watch(recordingProvider);
     final theme = Theme.of(context);
 
-    // stopped状態時はマイクボタンを非表示
     if (recordingState == RecordingState.stopped) {
       return const SizedBox.shrink();
     }
 
-    return GestureDetector(
-      onTap: () => _handleTap(ref),
-      child: Container(
-        width: 120,
-        height: 120,
-        decoration: BoxDecoration(
-          color: _getButtonColor(recordingState, theme),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              blurRadius: 16,
-              spreadRadius: 4,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => _handleTap(ref),
+          child: Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: _getButtonColor(recordingState, theme),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  blurRadius: 16,
+                  spreadRadius: 4,
+                ),
+              ],
             ),
-          ],
+            child: Icon(
+              _getButtonIcon(recordingState),
+              size: 48,
+              color: Colors.white,
+            ),
+          ),
         ),
-        child: Icon(
-          _getButtonIcon(recordingState),
-          size: 48,
-          color: Colors.white,
+        if (recordingState == RecordingState.recording ||
+            recordingState == RecordingState.paused) ...[
+          const SizedBox(height: 24),
+          _buildSecondaryControls(context, ref, recordingState),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSecondaryControls(
+    BuildContext context,
+    WidgetRef ref,
+    RecordingState recordingState,
+  ) {
+    final theme = Theme.of(context);
+    final isPaused = recordingState == RecordingState.paused;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () => _togglePause(ref, isPaused),
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              isPaused ? Icons.play_arrow : Icons.pause,
+              color: theme.colorScheme.primary,
+              size: 24,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -47,35 +94,37 @@ class RecordingButton extends ConsumerWidget {
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final timerNotifier = ref.read(recordingTimerProvider.notifier);
 
-    print('🔘 RecordingButton: タップ (state = $recordingState)');
-
     switch (recordingState) {
       case RecordingState.idle:
-        print('🔘 RecordingButton: 録音開始処理');
         await recordingNotifier.startRecording();
         timerNotifier.start();
-        print('🔘 RecordingButton: タイマー開始');
         break;
       case RecordingState.recording:
-        print('🔘 RecordingButton: 録音停止処理');
+      case RecordingState.paused:
         final filePath = await recordingNotifier.stopRecording();
         timerNotifier.stop();
-        print('🔘 RecordingButton: タイマー停止');
-
         if (filePath == null) {
-          print('🔘 RecordingButton: filePath が null - エラーダイアログ表示');
           _showErrorDialog(ref);
         } else {
-          print('🔘 RecordingButton: 録音成功 - filePath = $filePath');
-          print('🔘 RecordingButton: AudioPlayer にファイルをロード');
           final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
           await audioPlayerNotifier.load(filePath);
-          print('🔘 RecordingButton: AudioPlayer ロード完了');
         }
         break;
       case RecordingState.stopped:
-        print('🔘 RecordingButton: stopped 状態 - 何もしない');
         break;
+    }
+  }
+
+  void _togglePause(WidgetRef ref, bool isPaused) async {
+    final recordingNotifier = ref.read(recordingProvider.notifier);
+    final timerNotifier = ref.read(recordingTimerProvider.notifier);
+
+    if (isPaused) {
+      await recordingNotifier.resumeRecording();
+      timerNotifier.resume();
+    } else {
+      await recordingNotifier.pauseRecording();
+      timerNotifier.pause();
     }
   }
 
@@ -107,6 +156,8 @@ class RecordingButton extends ConsumerWidget {
         return theme.colorScheme.primary;
       case RecordingState.recording:
         return Colors.red;
+      case RecordingState.paused:
+        return Colors.red.withValues(alpha: 0.7);
       case RecordingState.stopped:
         return theme.colorScheme.primary;
     }
@@ -117,6 +168,7 @@ class RecordingButton extends ConsumerWidget {
       case RecordingState.idle:
         return Icons.mic;
       case RecordingState.recording:
+      case RecordingState.paused:
         return Icons.stop;
       case RecordingState.stopped:
         return Icons.mic;

@@ -57,10 +57,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
     final recordingState = ref.read(recordingProvider);
 
-    if (recordingState == RecordingState.recording) {
+    if (recordingState == RecordingState.recording ||
+        recordingState == RecordingState.paused) {
       final confirmed = await _showRecordingWarningDialog();
       if (confirmed == true) {
-        await _stopRecording();
+        await _stopAndDiscardRecording();
         setState(() {
           _currentIndex = index;
         });
@@ -77,7 +78,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('録音中です'),
-        content: const Text('録音を停止してタブを切り替えますか？'),
+        content: const Text('録音を破棄してタブを切り替えますか？'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -85,19 +86,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('停止して切り替え'),
+            child: const Text('破棄して切り替え'),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _stopRecording() async {
+  Future<void> _stopAndDiscardRecording() async {
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
     final timerNotifier = ref.read(recordingTimerProvider.notifier);
 
-    await recordingNotifier.stopRecording();
     await audioPlayerNotifier.stop();
     await recordingNotifier.resetRecording();
     timerNotifier.reset();

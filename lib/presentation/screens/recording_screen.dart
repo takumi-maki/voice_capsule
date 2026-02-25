@@ -68,6 +68,8 @@ class RecordingScreen extends ConsumerWidget {
         return 'Tap the microphone to start recording your voice capsule';
       case RecordingState.recording:
         return 'Recording... Speak clearly into your device';
+      case RecordingState.paused:
+        return 'Recording paused. Tap play to resume';
       case RecordingState.stopped:
         return 'Recording complete! Play, save, or try again';
     }
