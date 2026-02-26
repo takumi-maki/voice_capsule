@@ -16,103 +16,108 @@ class RecordingButton extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: () => _handleTap(ref),
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: _getButtonColor(recordingState, theme),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  blurRadius: 16,
-                  spreadRadius: 4,
-                ),
-              ],
+    if (recordingState == RecordingState.idle) {
+      return _buildMicButton(ref, theme);
+    }
+
+    return _buildRecordingControls(context, ref, recordingState, theme);
+  }
+
+  Widget _buildMicButton(WidgetRef ref, ThemeData theme) {
+    return GestureDetector(
+      onTap: () => _startRecording(ref),
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withValues(alpha: 0.2),
+              blurRadius: 16,
+              spreadRadius: 4,
             ),
-            child: Icon(
-              _getButtonIcon(recordingState),
-              size: 48,
-              color: Colors.white,
-            ),
-          ),
+          ],
         ),
-        if (recordingState == RecordingState.recording ||
-            recordingState == RecordingState.paused) ...[
-          const SizedBox(height: 24),
-          _buildSecondaryControls(context, ref, recordingState),
-        ],
-      ],
+        child: const Icon(Icons.mic, size: 48, color: Colors.white),
+      ),
     );
   }
 
-  Widget _buildSecondaryControls(
+  Widget _buildRecordingControls(
     BuildContext context,
     WidgetRef ref,
-    RecordingState recordingState,
+    RecordingState state,
+    ThemeData theme,
   ) {
-    final theme = Theme.of(context);
-    final isPaused = recordingState == RecordingState.paused;
+    final isPaused = state == RecordingState.paused;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GestureDetector(
+        _buildCircleButton(
+          icon: Icons.close,
+          color: Colors.white,
+          iconColor: Colors.grey,
+          size: 56,
+          onTap: () => _showDiscardDialog(context, ref),
+        ),
+        const SizedBox(width: 24),
+        _buildCircleButton(
+          icon: isPaused ? Icons.play_arrow : Icons.pause,
+          color: theme.colorScheme.primary,
+          iconColor: Colors.white,
+          size: 80,
+          iconSize: 40,
           onTap: () => _togglePause(ref, isPaused),
-          child: Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Icon(
-              isPaused ? Icons.play_arrow : Icons.pause,
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
-          ),
+        ),
+        const SizedBox(width: 24),
+        _buildCircleButton(
+          icon: Icons.check,
+          color: Colors.white,
+          iconColor: Colors.grey,
+          size: 56,
+          onTap: () => _stopRecording(ref),
         ),
       ],
     );
   }
 
-  void _handleTap(WidgetRef ref) async {
-    final recordingState = ref.read(recordingProvider);
+  Widget _buildCircleButton({
+    required IconData icon,
+    required Color color,
+    required Color iconColor,
+    required double size,
+    double iconSize = 24,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, size: iconSize, color: iconColor),
+      ),
+    );
+  }
+
+  void _startRecording(WidgetRef ref) async {
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final timerNotifier = ref.read(recordingTimerProvider.notifier);
-
-    switch (recordingState) {
-      case RecordingState.idle:
-        await recordingNotifier.startRecording();
-        timerNotifier.start();
-        break;
-      case RecordingState.recording:
-      case RecordingState.paused:
-        final filePath = await recordingNotifier.stopRecording();
-        timerNotifier.stop();
-        if (filePath == null) {
-          _showErrorDialog(ref);
-        } else {
-          final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-          await audioPlayerNotifier.load(filePath);
-        }
-        break;
-      case RecordingState.stopped:
-        break;
-    }
+    await recordingNotifier.startRecording();
+    timerNotifier.start();
   }
 
   void _togglePause(WidgetRef ref, bool isPaused) async {
@@ -125,6 +130,48 @@ class RecordingButton extends ConsumerWidget {
     } else {
       await recordingNotifier.pauseRecording();
       timerNotifier.pause();
+    }
+  }
+
+  void _stopRecording(WidgetRef ref) async {
+    final recordingNotifier = ref.read(recordingProvider.notifier);
+    final timerNotifier = ref.read(recordingTimerProvider.notifier);
+
+    final filePath = await recordingNotifier.stopRecording();
+    timerNotifier.stop();
+
+    if (filePath == null) {
+      _showErrorDialog(ref);
+    } else {
+      final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
+      await audioPlayerNotifier.load(filePath);
+    }
+  }
+
+  void _showDiscardDialog(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('録音を破棄'),
+        content: const Text('現在の録音を破棄しますか？この操作は取り消せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('破棄', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final recordingNotifier = ref.read(recordingProvider.notifier);
+      final timerNotifier = ref.read(recordingTimerProvider.notifier);
+      await recordingNotifier.resetRecording();
+      timerNotifier.reset();
     }
   }
 
@@ -148,30 +195,5 @@ class RecordingButton extends ConsumerWidget {
 
     final recordingNotifier = ref.read(recordingProvider.notifier);
     await recordingNotifier.resetRecording();
-  }
-
-  Color _getButtonColor(RecordingState state, ThemeData theme) {
-    switch (state) {
-      case RecordingState.idle:
-        return theme.colorScheme.primary;
-      case RecordingState.recording:
-        return Colors.red;
-      case RecordingState.paused:
-        return Colors.red.withValues(alpha: 0.7);
-      case RecordingState.stopped:
-        return theme.colorScheme.primary;
-    }
-  }
-
-  IconData _getButtonIcon(RecordingState state) {
-    switch (state) {
-      case RecordingState.idle:
-        return Icons.mic;
-      case RecordingState.recording:
-      case RecordingState.paused:
-        return Icons.stop;
-      case RecordingState.stopped:
-        return Icons.mic;
-    }
   }
 }
