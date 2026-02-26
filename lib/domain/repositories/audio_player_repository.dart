@@ -1,6 +1,6 @@
 abstract class AudioPlayerRepository {
   Future<void> load(String filePath);
-  Future<void> play(String filePath);
+  Future<void> play(String filePath, {String? title});
   Future<void> pause();
   Future<void> resume();
   Future<void> stop();

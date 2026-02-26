@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audio_session/audio_session.dart';
 import 'presentation/screens/main_screen.dart';
 import 'presentation/screens/onboarding/child_profile_setup_screen.dart';
 import 'application/providers/child_profile_provider.dart';
@@ -10,8 +11,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await _clearOldData();
+  await _initAudioSession();
 
   runApp(const ProviderScope(child: MyApp()));
+}
+
+Future<void> _initAudioSession() async {
+  final session = await AudioSession.instance;
+  await session.configure(
+    const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.music,
+        usage: AndroidAudioUsage.media,
+      ),
+    ),
+  );
 }
 
 Future<void> _clearOldData() async {

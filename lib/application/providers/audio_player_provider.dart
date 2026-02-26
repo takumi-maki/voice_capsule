@@ -69,9 +69,9 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
     print('🎵 AudioPlayerNotifier: load() 完了');
   }
 
-  Future<void> play(String filePath) async {
+  Future<void> play(String filePath, {String? title}) async {
     print('🎵 AudioPlayerNotifier: play() 呼び出し');
-    await _repository.play(filePath);
+    await _repository.play(filePath, title: title);
   }
 
   Future<void> pause() async {

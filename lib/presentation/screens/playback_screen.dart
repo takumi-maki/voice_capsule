@@ -30,7 +30,10 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
 
   Future<void> _loadAndPlay() async {
     final notifier = ref.read(audioPlayerProvider.notifier);
-    await notifier.play(widget.recording.filePath);
+    await notifier.play(
+      widget.recording.filePath,
+      title: widget.recording.title,
+    );
   }
 
   @override

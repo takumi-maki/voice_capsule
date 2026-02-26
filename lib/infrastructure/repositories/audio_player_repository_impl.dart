@@ -12,9 +12,13 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
   }
 
   @override
-  Future<void> play(String filePath) async {
+  Future<void> play(String filePath, {String? title}) async {
     print('🎵 AudioPlayer: 再生開始 - $filePath');
-    await _player.setFilePath(filePath);
+    final source = AudioSource.file(
+      filePath,
+      tag: {'id': filePath, 'title': title ?? 'VoiceCapsule'},
+    );
+    await _player.setAudioSource(source);
     await _player.play();
   }
 
