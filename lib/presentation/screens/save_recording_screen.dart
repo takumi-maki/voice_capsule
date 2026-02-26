@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/recording.dart';
 import '../../domain/entities/child.dart';
 import '../../application/providers/recording_provider.dart';
+import '../../application/providers/recording_timer_provider.dart';
 import '../../application/providers/child_profile_provider.dart';
 import 'background_selection_screen.dart';
 import 'child_selection_screen.dart';
@@ -238,11 +239,13 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
     }
 
     final recordingNotifier = ref.read(recordingProvider.notifier);
+    final duration = ref.read(recordingTimerProvider).inSeconds;
     await recordingNotifier.saveRecording(
       ref,
       title,
       _selectedLocation,
       childIds: _selectedChildIds,
+      duration: duration,
     );
     await recordingNotifier.resetRecording();
 

@@ -90,6 +90,7 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
     String title,
     BackgroundType location, {
     List<String>? childIds,
+    int duration = 0,
   }) async {
     print('💾 saveRecording: 開始');
     print('💾 saveRecording: title = $title, location = $location');
@@ -119,7 +120,7 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
       title: title,
       location: location,
       childIds: ids,
-      duration: 0,
+      duration: duration,
     );
     print('💾 saveRecording: Recording作成 = ${recording.id}');
 
