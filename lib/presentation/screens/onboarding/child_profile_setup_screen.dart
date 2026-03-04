@@ -147,6 +147,8 @@ class _ChildProfileSetupScreenState
   }
 
   void _showPhotoOptions() {
+    final hasPhoto = _photoPath != null && File(_photoPath!).existsSync();
+
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -169,7 +171,7 @@ class _ChildProfileSetupScreenState
                 _pickImage(ImageSource.gallery);
               },
             ),
-            if (_photoPath != null)
+            if (hasPhoto)
               ListTile(
                 leading: const Icon(Icons.delete),
                 title: const Text('写真を削除'),
