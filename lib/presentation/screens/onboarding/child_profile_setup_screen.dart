@@ -1,12 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/child_profile_provider.dart';
+import '../../../domain/entities/child.dart';
+import '../main_screen.dart';
 
 class ChildProfileSetupScreen extends ConsumerStatefulWidget {
-  final bool isEditing;
+  final Child? child; // 編集時に渡す。nullなら新規作成
+  final bool isOnboarding; // オンボーディングからの遷移かどうか
 
-  const ChildProfileSetupScreen({super.key, this.isEditing = false});
+  const ChildProfileSetupScreen({
+    super.key,
+    this.child,
+    this.isOnboarding = false,
+  });
+
+  bool get isEditing => child != null;
 
   @override
   ConsumerState<ChildProfileSetupScreen> createState() =>
@@ -20,6 +30,15 @@ class _ChildProfileSetupScreenState
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.isEditing) {
+      _nameController.text = widget.child!.name;
+      _photoPath = widget.child!.photoPath;
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
@@ -30,7 +49,7 @@ class _ChildProfileSetupScreenState
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('お子様のプロフィール')),
+      appBar: AppBar(title: Text(widget.isEditing ? 'プロフィール編集' : 'お子様のプロフィール')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -38,7 +57,7 @@ class _ChildProfileSetupScreenState
           children: [
             const SizedBox(height: 24),
             Text(
-              'お子様の情報を登録してください',
+              widget.isEditing ? 'プロフィールを編集してください' : 'お子様の情報を登録してください',
               style: theme.textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
@@ -50,7 +69,9 @@ class _ChildProfileSetupScreenState
             const SizedBox(height: 16),
             Text(
               'タップして写真を設定',
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
             ),
             const SizedBox(height: 48),
             TextField(
@@ -70,7 +91,7 @@ class _ChildProfileSetupScreenState
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: _isLoading
@@ -82,7 +103,7 @@ class _ChildProfileSetupScreenState
                           color: Colors.white,
                         ),
                       )
-                    : const Text('保存'),
+                    : Text(widget.isEditing ? '更新する' : '保存'),
               ),
             ),
           ],
@@ -134,7 +155,7 @@ class _ChildProfileSetupScreenState
               title: const Text('カメラで撮影'),
               onTap: () {
                 Navigator.pop(context);
-                _pickImageFromCamera();
+                _pickImage(ImageSource.camera);
               },
             ),
             ListTile(
@@ -142,7 +163,7 @@ class _ChildProfileSetupScreenState
               title: const Text('ギャラリーから選択'),
               onTap: () {
                 Navigator.pop(context);
-                _pickImageFromGallery();
+                _pickImage(ImageSource.gallery);
               },
             ),
             if (_photoPath != null)
@@ -151,9 +172,7 @@ class _ChildProfileSetupScreenState
                 title: const Text('写真を削除'),
                 onTap: () {
                   Navigator.pop(context);
-                  setState(() {
-                    _photoPath = null;
-                  });
+                  setState(() => _photoPath = null);
                 },
               ),
           ],
@@ -162,43 +181,33 @@ class _ChildProfileSetupScreenState
     );
   }
 
-  Future<void> _pickImageFromCamera() async {
+  Future<void> _pickImage(ImageSource source) async {
     final notifier = ref.read(childProfileProvider.notifier);
-    final path = await notifier.pickImageFromCamera();
+    String? path;
 
-    if (path != null) {
-      setState(() {
-        _photoPath = path;
-      });
+    if (widget.isEditing) {
+      // 編集時はchildIdが確定済みなのでIDベースパスに直接保存
+      path = source == ImageSource.camera
+          ? await notifier.pickImageFromCameraForChild(widget.child!.id)
+          : await notifier.pickImageFromGalleryForChild(widget.child!.id);
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('カメラへのアクセスに失敗しました。設定から権限を許可してください。')),
-        );
-      }
+      // 新規作成時は一時パスに保存
+      path = source == ImageSource.camera
+          ? await notifier.pickImageFromCamera()
+          : await notifier.pickImageFromGallery();
     }
-  }
-
-  Future<void> _pickImageFromGallery() async {
-    final notifier = ref.read(childProfileProvider.notifier);
-    final path = await notifier.pickImageFromGallery();
 
     if (path != null) {
-      setState(() {
-        _photoPath = path;
-      });
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ギャラリーへのアクセスに失敗しました。設定から権限を許可してください。')),
-        );
-      }
+      setState(() => _photoPath = path);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('写真の取得に失敗しました。設定から権限を許可してください。')),
+      );
     }
   }
 
   Future<void> _saveProfile() async {
     final name = _nameController.text.trim();
-
     if (name.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -206,16 +215,27 @@ class _ChildProfileSetupScreenState
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final notifier = ref.read(childProfileProvider.notifier);
-      await notifier.createProfile(name, photoPath: _photoPath);
 
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/');
+      if (widget.isEditing) {
+        await notifier.updateProfile(
+          widget.child!.copyWith(name: name, photoPath: _photoPath),
+        );
+      } else {
+        await notifier.createProfile(name, tempPhotoPath: _photoPath);
+      }
+
+      if (!mounted) return;
+
+      if (widget.isOnboarding) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+        );
+      } else {
+        Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
@@ -224,11 +244,7 @@ class _ChildProfileSetupScreenState
         ).showSnackBar(const SnackBar(content: Text('保存に失敗しました')));
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 }

@@ -82,9 +82,7 @@ class SettingsScreen extends ConsumerWidget {
   void _navigateToProfileEdit(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const ChildProfileSetupScreen(isEditing: true),
-      ),
+      MaterialPageRoute(builder: (_) => const ChildProfileSetupScreen()),
     );
   }
 

@@ -238,7 +238,9 @@ class _UserProfileSetupScreenState
       final childProfile = ref.read(childProfileProvider);
       if (childProfile == null) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ChildProfileSetupScreen()),
+          MaterialPageRoute(
+            builder: (_) => const ChildProfileSetupScreen(isOnboarding: true),
+          ),
         );
       } else {
         Navigator.of(context).pushReplacement(

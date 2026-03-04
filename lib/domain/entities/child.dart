@@ -11,6 +11,15 @@ class Child {
     required this.createdAt,
   });
 
+  // photoPathをnullにクリアしたい場合は clearPhoto: true を渡す
+  Child copyWith({String? name, String? photoPath, bool clearPhoto = false}) =>
+      Child(
+        id: id,
+        name: name ?? this.name,
+        photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
+        createdAt: createdAt,
+      );
+
   String get initials {
     if (name.isEmpty) return '?';
     final words = name.trim().split(RegExp(r'\s+'));
