@@ -1,5 +1,4 @@
 import 'package:flutter/painting.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -31,15 +30,11 @@ class UserProfileNotifier extends StateNotifier<User?> {
   }
 
   Future<void> updateProfile(User user) async {
-    debugPrint(
-      '🔄 [UserProfile] updateProfile: name=${user.name}, photoPath=${user.photoPath}',
-    );
     await _repository.saveProfile(user);
     state = user;
     // 固定パス上書きによるFileImageキャッシュを破棄（liveImagesも含む）
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
-    debugPrint('✅ [UserProfile] imageCache cleared, state updated');
   }
 
   Future<String?> pickImageFromGallery() async {
@@ -50,16 +45,9 @@ class UserProfileNotifier extends StateNotifier<User?> {
         maxHeight: 512,
         imageQuality: 85,
       );
-      if (image == null) {
-        debugPrint('📷 [UserProfile] pickImageFromGallery: cancelled');
-        return null;
-      }
-      debugPrint('📷 [UserProfile] pickImageFromGallery: picked=${image.path}');
-      final saved = await _repository.savePhoto(image.path);
-      debugPrint('💾 [UserProfile] savePhoto result: $saved');
-      return saved;
+      if (image == null) return null;
+      return await _repository.savePhoto(image.path);
     } catch (e) {
-      debugPrint('❌ [UserProfile] pickImageFromGallery error: $e');
       return null;
     }
   }
@@ -72,16 +60,9 @@ class UserProfileNotifier extends StateNotifier<User?> {
         maxHeight: 512,
         imageQuality: 85,
       );
-      if (image == null) {
-        debugPrint('📷 [UserProfile] pickImageFromCamera: cancelled');
-        return null;
-      }
-      debugPrint('📷 [UserProfile] pickImageFromCamera: picked=${image.path}');
-      final saved = await _repository.savePhoto(image.path);
-      debugPrint('💾 [UserProfile] savePhoto result: $saved');
-      return saved;
+      if (image == null) return null;
+      return await _repository.savePhoto(image.path);
     } catch (e) {
-      debugPrint('❌ [UserProfile] pickImageFromCamera error: $e');
       return null;
     }
   }

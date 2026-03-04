@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/user.dart';
@@ -26,12 +25,8 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> saveProfile(User user) async {
-    debugPrint(
-      '💾 [UserRepositoryImpl] saveProfile: id=${user.id}, photoPath=${user.photoPath}',
-    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_profileKey, jsonEncode(user.toJson()));
-    debugPrint('✅ [UserRepositoryImpl] saveProfile done');
   }
 
   @override
@@ -44,7 +39,6 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<String?> savePhoto(String sourcePath) async {
     try {
-      debugPrint('📁 [UserRepositoryImpl] savePhoto: src=$sourcePath');
       final dir = await getApplicationDocumentsDirectory();
       final profileDir = Directory('${dir.path}/user_profile');
 
@@ -55,10 +49,8 @@ class UserRepositoryImpl implements UserRepository {
       // 固定パスに上書き（コピー失敗時も元ファイルが残る安全な方式）
       final destPath = '${profileDir.path}/$_photoFileName';
       await File(sourcePath).copy(destPath);
-      debugPrint('✅ [UserRepositoryImpl] savePhoto done: dest=$destPath');
       return destPath;
     } catch (e) {
-      debugPrint('❌ [UserRepositoryImpl] savePhoto error: $e');
       return null;
     }
   }
