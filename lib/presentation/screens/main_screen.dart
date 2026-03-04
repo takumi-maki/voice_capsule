@@ -5,6 +5,7 @@ import '../../application/providers/audio_player_provider.dart';
 import '../../application/providers/recording_timer_provider.dart';
 import 'recording_screen.dart';
 import 'timeline_screen.dart';
+import 'family_screen.dart';
 import 'settings_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -32,20 +33,35 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: const [RecordingScreen(), TimelineScreen(), SettingsScreen()],
+        children: const [
+          TimelineScreen(),
+          RecordingScreen(),
+          FamilyScreen(),
+          SettingsScreen(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => _onTabTapped(index),
+        onTap: _onTabTapped,
         selectedItemColor: theme.colorScheme.primary,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.mic), label: 'RECORD'),
-          BottomNavigationBarItem(icon: Icon(Icons.inbox), label: 'MEMORIES'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'SETTINGS',
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mic_outlined),
+            label: 'Capsules',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_outline),
+            label: 'Family',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            label: 'Settings',
           ),
         ],
       ),
@@ -62,14 +78,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       final confirmed = await _showRecordingWarningDialog();
       if (confirmed == true) {
         await _stopAndDiscardRecording();
-        setState(() {
-          _currentIndex = index;
-        });
+        setState(() => _currentIndex = index);
       }
     } else {
-      setState(() {
-        _currentIndex = index;
-      });
+      setState(() => _currentIndex = index);
     }
   }
 
@@ -94,12 +106,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   Future<void> _stopAndDiscardRecording() async {
-    final recordingNotifier = ref.read(recordingProvider.notifier);
-    final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-    final timerNotifier = ref.read(recordingTimerProvider.notifier);
-
-    await audioPlayerNotifier.stop();
-    await recordingNotifier.resetRecording();
-    timerNotifier.reset();
+    await ref.read(audioPlayerProvider.notifier).stop();
+    await ref.read(recordingProvider.notifier).resetRecording();
+    ref.read(recordingTimerProvider.notifier).reset();
   }
 }
