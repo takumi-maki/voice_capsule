@@ -17,7 +17,7 @@ class PlaybackProgressBar extends ConsumerWidget {
               _handleSeek(details.localPosition, ref, context),
           onHorizontalDragUpdate: (details) =>
               _handleSeek(details.localPosition, ref, context),
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             height: 24,
             child: Stack(

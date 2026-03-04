@@ -56,7 +56,7 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
   @override
   Stream<void> get playbackCompletedStream => _player.playerStateStream
       .where((state) => state.processingState == ProcessingState.completed)
-      .map((_) => null);
+      .map((_) {});
 
   @override
   void dispose() {
