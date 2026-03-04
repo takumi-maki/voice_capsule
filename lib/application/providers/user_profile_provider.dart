@@ -36,8 +36,9 @@ class UserProfileNotifier extends StateNotifier<User?> {
     );
     await _repository.saveProfile(user);
     state = user;
-    // 固定パス上書きによるFileImageキャッシュを破棄
+    // 固定パス上書きによるFileImageキャッシュを破棄（liveImagesも含む）
     PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
     debugPrint('✅ [UserProfile] imageCache cleared, state updated');
   }
 
