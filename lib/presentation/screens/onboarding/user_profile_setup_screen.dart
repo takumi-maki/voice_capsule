@@ -215,16 +215,24 @@ class _UserProfileSetupScreenState
     setState(() => _isLoading = true);
 
     try {
-      await ref
-          .read(userProfileProvider.notifier)
-          .createProfile(name, photoPath: _photoPath);
-
-      if (!mounted) return;
+      final notifier = ref.read(userProfileProvider.notifier);
 
       if (widget.isEditing) {
+        // 既存のid・createdAtを保持したまま更新
+        final current = ref.read(userProfileProvider);
+        if (current != null) {
+          await notifier.updateProfile(
+            current.copyWith(name: name, photoPath: _photoPath),
+          );
+        }
+        if (!mounted) return;
         Navigator.of(context).pop();
         return;
       }
+
+      await notifier.createProfile(name, photoPath: _photoPath);
+
+      if (!mounted) return;
 
       // オンボーディング: 子供プロフィールが未設定なら次のステップへ
       final childProfile = ref.read(childProfileProvider);

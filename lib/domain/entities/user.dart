@@ -20,6 +20,13 @@ class User {
     return name[0].toUpperCase();
   }
 
+  User copyWith({String? name, String? photoPath}) => User(
+    id: id,
+    name: name ?? this.name,
+    photoPath: photoPath,
+    createdAt: createdAt,
+  );
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,

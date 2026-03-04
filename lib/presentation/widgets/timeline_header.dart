@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/user_profile_provider.dart';
+import '../screens/onboarding/user_profile_setup_screen.dart';
 
 class TimelineHeader extends ConsumerWidget {
   const TimelineHeader({super.key});
@@ -35,7 +36,15 @@ class TimelineHeader extends ConsumerWidget {
               ),
             ],
           ),
-          _UserAvatar(user: user, theme: theme),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const UserProfileSetupScreen(isEditing: true),
+              ),
+            ),
+            child: _UserAvatar(user: user, theme: theme),
+          ),
         ],
       ),
     );
