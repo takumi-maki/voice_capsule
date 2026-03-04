@@ -69,6 +69,7 @@ class _UserAvatar extends StatelessWidget {
 
     if (user.photoPath != null) {
       return CircleAvatar(
+        key: ValueKey(user.updatedAt),
         radius: 20,
         backgroundImage: FileImage(File(user.photoPath as String)),
       );

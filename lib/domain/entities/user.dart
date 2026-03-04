@@ -3,13 +3,15 @@ class User {
   final String name;
   final String? photoPath;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   User({
     required this.id,
     required this.name,
     this.photoPath,
     required this.createdAt,
-  });
+    DateTime? updatedAt,
+  }) : updatedAt = updatedAt ?? createdAt;
 
   String get initials {
     if (name.isEmpty) return '?';
@@ -30,6 +32,7 @@ class User {
         ? this.photoPath
         : photoPath as String?,
     createdAt: createdAt,
+    updatedAt: DateTime.now(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +40,7 @@ class User {
     'name': name,
     'photoPath': photoPath,
     'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
   };
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -44,5 +48,8 @@ class User {
     name: json['name'],
     photoPath: json['photoPath'],
     createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.parse(json['updatedAt'])
+        : DateTime.parse(json['createdAt']),
   );
 }
