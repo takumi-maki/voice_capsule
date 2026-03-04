@@ -113,7 +113,9 @@ class _ChildProfileSetupScreenState
   }
 
   Widget _buildPhotoPreview(ThemeData theme) {
-    if (_photoPath != null) {
+    final hasPhoto = _photoPath != null && File(_photoPath!).existsSync();
+
+    if (hasPhoto) {
       return Container(
         key: ValueKey(_photoPath),
         width: 120,
