@@ -7,7 +7,6 @@ import '../../domain/repositories/user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
   static const String _profileKey = 'user_profile';
-  static const String _photoFileName = 'photo.jpg';
 
   @override
   Future<User?> getProfile() async {
@@ -41,17 +40,33 @@ class UserRepositoryImpl implements UserRepository {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final profileDir = Directory('${dir.path}/user_profile');
-
       if (!await profileDir.exists()) {
         await profileDir.create(recursive: true);
       }
 
-      // 固定パスに上書き（コピー失敗時も元ファイルが残る安全な方式）
-      final destPath = '${profileDir.path}/$_photoFileName';
+      // タイムスタンプ付きパスで保存（FileImageキャッシュキーを毎回変える）
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final destPath = '${profileDir.path}/photo_$timestamp.jpg';
       await File(sourcePath).copy(destPath);
+
+      // 古いファイルを非同期でクリーンアップ（失敗しても新ファイルは残る）
+      _cleanupOldPhotos(profileDir, destPath);
+
       return destPath;
     } catch (e) {
       return null;
+    }
+  }
+
+  void _cleanupOldPhotos(Directory dir, String keepPath) async {
+    try {
+      await for (final file in dir.list()) {
+        if (file is File && file.path != keepPath) {
+          await file.delete();
+        }
+      }
+    } catch (_) {
+      // クリーンアップ失敗は無視
     }
   }
 
@@ -59,9 +74,9 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> deletePhoto() async {
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final photoFile = File('${dir.path}/user_profile/$_photoFileName');
-      if (await photoFile.exists()) {
-        await photoFile.delete();
+      final profileDir = Directory('${dir.path}/user_profile');
+      if (await profileDir.exists()) {
+        await profileDir.delete(recursive: true);
       }
     } catch (e) {
       // ignore
