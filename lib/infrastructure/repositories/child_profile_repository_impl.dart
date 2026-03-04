@@ -88,11 +88,30 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
       if (!await profileDir.exists()) {
         await profileDir.create(recursive: true);
       }
-      final destPath = '${profileDir.path}/photo.jpg';
+
+      // タイムスタンプ付きパスで保存（FileImageキャッシュキーを毎回変える）
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final destPath = '${profileDir.path}/photo_$timestamp.jpg';
       await File(sourcePath).copy(destPath);
+
+      // 古いファイルを非同期でクリーンアップ（失敗しても新ファイルは残る）
+      _cleanupOldPhotos(profileDir, destPath);
+
       return destPath;
     } catch (e) {
       return null;
+    }
+  }
+
+  void _cleanupOldPhotos(Directory dir, String keepPath) async {
+    try {
+      await for (final file in dir.list()) {
+        if (file is File && file.path != keepPath) {
+          await file.delete();
+        }
+      }
+    } catch (_) {
+      // クリーンアップ失敗は無視
     }
   }
 
@@ -100,9 +119,9 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
   Future<void> deletePhoto(String childId) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final photoFile = File('${dir.path}/child_profiles/$childId/photo.jpg');
-      if (await photoFile.exists()) {
-        await photoFile.delete();
+      final profileDir = Directory('${dir.path}/child_profiles/$childId');
+      if (await profileDir.exists()) {
+        await profileDir.delete(recursive: true);
       }
     } catch (e) {
       // ignore

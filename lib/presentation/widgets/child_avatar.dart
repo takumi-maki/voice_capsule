@@ -14,6 +14,7 @@ class ChildAvatar extends StatelessWidget {
 
     if (child.photoPath != null && File(child.photoPath!).existsSync()) {
       return CircleAvatar(
+        key: ValueKey(child.photoPath),
         radius: size / 2,
         backgroundImage: FileImage(File(child.photoPath!)),
       );
