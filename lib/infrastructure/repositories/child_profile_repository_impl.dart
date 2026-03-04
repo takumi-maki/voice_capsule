@@ -8,18 +8,14 @@ import '../../domain/repositories/child_profile_repository.dart';
 class ChildProfileRepositoryImpl implements ChildProfileRepository {
   static const String _profileKey = 'child_profile';
   static const String _allProfilesKey = 'child_profiles';
-  static const String _photoFileName = 'photo.jpg';
 
   @override
   Future<Child?> getProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_profileKey);
-
     if (jsonString == null) return null;
-
     try {
-      final json = jsonDecode(jsonString) as Map<String, dynamic>;
-      return Child.fromJson(json);
+      return Child.fromJson(jsonDecode(jsonString) as Map<String, dynamic>);
     } catch (e) {
       return null;
     }
@@ -29,9 +25,7 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
   Future<List<Child>> getAllProfiles() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_allProfilesKey);
-
     if (jsonString == null) {
-      // 既存の単一プロフィールを移行
       final single = await getProfile();
       if (single != null) {
         await _saveAllProfiles([single]);
@@ -39,7 +33,6 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
       }
       return [];
     }
-
     try {
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
@@ -53,10 +46,8 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
   @override
   Future<void> saveProfile(Child child) async {
     final prefs = await SharedPreferences.getInstance();
-    final jsonString = jsonEncode(child.toJson());
-    await prefs.setString(_profileKey, jsonString);
+    await prefs.setString(_profileKey, jsonEncode(child.toJson()));
 
-    // リストにも追加/更新
     final profiles = await getAllProfiles();
     final index = profiles.indexWhere((p) => p.id == child.id);
     if (index >= 0) {
@@ -67,33 +58,38 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
     await _saveAllProfiles(profiles);
   }
 
-  Future<void> _saveAllProfiles(List<Child> profiles) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = profiles.map((p) => p.toJson()).toList();
-    await prefs.setString(_allProfilesKey, jsonEncode(jsonList));
-  }
-
   @override
   Future<void> deleteProfile() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_profileKey);
-    await deletePhoto();
   }
 
   @override
-  Future<String?> savePhoto(String sourcePath) async {
+  Future<void> deleteProfileById(String id) async {
+    final profiles = await getAllProfiles();
+    final updated = profiles.where((p) => p.id != id).toList();
+    await _saveAllProfiles(updated);
+    await deletePhoto(id);
+  }
+
+  Future<void> _saveAllProfiles(List<Child> profiles) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _allProfilesKey,
+      jsonEncode(profiles.map((p) => p.toJson()).toList()),
+    );
+  }
+
+  @override
+  Future<String?> savePhoto(String sourcePath, String childId) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final profileDir = Directory('${dir.path}/child_profile');
-
+      final profileDir = Directory('${dir.path}/child_profiles/$childId');
       if (!await profileDir.exists()) {
         await profileDir.create(recursive: true);
       }
-
-      final destPath = '${profileDir.path}/$_photoFileName';
-      final sourceFile = File(sourcePath);
-      await sourceFile.copy(destPath);
-
+      final destPath = '${profileDir.path}/photo.jpg';
+      await File(sourcePath).copy(destPath);
       return destPath;
     } catch (e) {
       return null;
@@ -101,16 +97,15 @@ class ChildProfileRepositoryImpl implements ChildProfileRepository {
   }
 
   @override
-  Future<void> deletePhoto() async {
+  Future<void> deletePhoto(String childId) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final photoFile = File('${dir.path}/child_profile/$_photoFileName');
-
+      final photoFile = File('${dir.path}/child_profiles/$childId/photo.jpg');
       if (await photoFile.exists()) {
         await photoFile.delete();
       }
     } catch (e) {
-      // Ignore errors
+      // ignore
     }
   }
 }

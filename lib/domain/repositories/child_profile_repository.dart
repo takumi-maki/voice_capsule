@@ -5,6 +5,7 @@ abstract class ChildProfileRepository {
   Future<List<Child>> getAllProfiles();
   Future<void> saveProfile(Child child);
   Future<void> deleteProfile();
-  Future<String?> savePhoto(String sourcePath);
-  Future<void> deletePhoto();
+  Future<void> deleteProfileById(String id);
+  Future<String?> savePhoto(String sourcePath, String childId);
+  Future<void> deletePhoto(String childId);
 }

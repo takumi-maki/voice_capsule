@@ -44,9 +44,16 @@ class UserRepositoryImpl implements UserRepository {
 
       if (!await profileDir.exists()) {
         await profileDir.create(recursive: true);
+      } else {
+        // 古い写真ファイルをクリーンアップ
+        await for (final file in profileDir.list()) {
+          if (file is File) await file.delete();
+        }
       }
 
-      final destPath = '${profileDir.path}/$_photoFileName';
+      // タイムスタンプ付きファイル名でキャッシュ問題を回避
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final destPath = '${profileDir.path}/photo_$timestamp.jpg';
       await File(sourcePath).copy(destPath);
       return destPath;
     } catch (e) {

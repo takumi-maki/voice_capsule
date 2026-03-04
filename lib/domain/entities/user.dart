@@ -20,10 +20,15 @@ class User {
     return name[0].toUpperCase();
   }
 
-  User copyWith({String? name, String? photoPath}) => User(
+  // photoPath の「変更なし」と「意図的なnull（削除）」を区別するsentinel
+  static const Object _unset = Object();
+
+  User copyWith({String? name, Object? photoPath = _unset}) => User(
     id: id,
     name: name ?? this.name,
-    photoPath: photoPath,
+    photoPath: identical(photoPath, _unset)
+        ? this.photoPath
+        : photoPath as String?,
     createdAt: createdAt,
   );
 
