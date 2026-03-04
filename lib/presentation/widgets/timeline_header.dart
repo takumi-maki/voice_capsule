@@ -1,14 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../application/providers/child_profile_provider.dart';
-import 'child_avatar.dart';
+import '../../application/providers/user_profile_provider.dart';
 
 class TimelineHeader extends ConsumerWidget {
   const TimelineHeader({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final child = ref.watch(childProfileProvider);
+    final user = ref.watch(userProfileProvider);
     final theme = Theme.of(context);
 
     return Container(
@@ -35,10 +35,46 @@ class TimelineHeader extends ConsumerWidget {
               ),
             ],
           ),
-          child != null
-              ? ChildAvatar(child: child, size: 40)
-              : const Icon(Icons.account_circle, size: 40),
+          _UserAvatar(user: user, theme: theme),
         ],
+      ),
+    );
+  }
+}
+
+class _UserAvatar extends StatelessWidget {
+  final dynamic user;
+  final ThemeData theme;
+
+  const _UserAvatar({required this.user, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    if (user == null) {
+      return Icon(
+        Icons.account_circle,
+        size: 40,
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+      );
+    }
+
+    if (user.photoPath != null) {
+      return CircleAvatar(
+        radius: 20,
+        backgroundImage: FileImage(File(user.photoPath as String)),
+      );
+    }
+
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+      child: Text(
+        user.initials as String,
+        style: TextStyle(
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
       ),
     );
   }

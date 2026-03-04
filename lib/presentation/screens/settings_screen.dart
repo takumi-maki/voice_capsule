@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'onboarding/child_profile_setup_screen.dart';
+import 'onboarding/user_profile_setup_screen.dart';
 import 'settings/app_info_screen.dart';
 import 'settings/privacy_policy_screen.dart';
 
@@ -13,6 +14,13 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('設定')),
       body: ListView(
         children: [
+          _buildSettingItem(
+            context,
+            icon: Icons.face,
+            title: '自分のプロフィール編集',
+            onTap: () => _navigateToUserProfileEdit(context),
+          ),
+          const Divider(height: 1),
           _buildSettingItem(
             context,
             icon: Icons.person,
@@ -59,6 +67,15 @@ class SettingsScreen extends ConsumerWidget {
       title: Text(title),
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
       onTap: onTap,
+    );
+  }
+
+  void _navigateToUserProfileEdit(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const UserProfileSetupScreen(isEditing: true),
+      ),
     );
   }
 
