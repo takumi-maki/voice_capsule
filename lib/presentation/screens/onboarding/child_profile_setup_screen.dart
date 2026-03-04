@@ -227,7 +227,11 @@ class _ChildProfileSetupScreenState
 
       if (widget.isEditing) {
         await notifier.updateProfile(
-          widget.child!.copyWith(name: name, photoPath: _photoPath),
+          widget.child!.copyWith(
+            name: name,
+            photoPath: _photoPath,
+            clearPhoto: _photoPath == null,
+          ),
         );
       } else {
         await notifier.createProfile(name, tempPhotoPath: _photoPath);
