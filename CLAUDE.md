@@ -148,3 +148,11 @@ void _handleSeek(Offset localPosition, WidgetRef ref, BuildContext context) {
 
 - デバイスID: `00008030-001611D41406402E`
 - 実行コマンド: `flutter run -d "00008030-001611D41406402E"`
+
+## 実装後のワークフロー
+
+実装完了後は必ず以下の順番で行う：
+
+1. シミュレータを起動してコンパイルエラーがないかチェック
+   - シミュレータコマンド: `flutter run -d "5FC79EDC-9669-43A8-B2F5-DB70399EAABF" 2>&1`
+2. エラーがなければ `git commit` する
