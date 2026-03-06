@@ -9,9 +9,7 @@ class SelectedChildrenNotifier extends StateNotifier<List<String>> {
 
   void toggle(String childId) {
     if (state.contains(childId)) {
-      if (state.length > 1) {
-        state = state.where((id) => id != childId).toList();
-      }
+      state = state.where((id) => id != childId).toList();
     } else {
       state = [...state, childId];
     }
