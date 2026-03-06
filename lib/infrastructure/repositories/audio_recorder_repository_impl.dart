@@ -20,9 +20,9 @@ class AudioRecorderRepositoryImpl implements AudioRecorderRepository {
       print('🎙️ 録音開始: $filePath');
       await _recorder.start(
         const RecordConfig(
-          encoder: AudioEncoder.aacLc,
-          bitRate: 128000,
-          sampleRate: 44100,
+          encoder: AudioEncoder.wav,
+          sampleRate: 16000,
+          numChannels: 1,
         ),
         path: filePath,
       );

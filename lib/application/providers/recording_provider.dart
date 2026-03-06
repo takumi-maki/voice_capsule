@@ -3,6 +3,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../infrastructure/repositories/audio_recorder_repository_impl.dart';
+import '../../infrastructure/repositories/audio_event_repository_impl.dart';
+import '../../application/usecases/analyze_recording_usecase.dart';
 import '../../domain/entities/recording.dart';
 import 'recording_list_provider.dart';
 import 'child_profile_provider.dart';
@@ -39,7 +41,7 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
     final dir = await getApplicationDocumentsDirectory();
     final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-    _currentFilePath = '${dir.path}/recording_$timestamp.aac';
+    _currentFilePath = '${dir.path}/recording_$timestamp.wav';
     print('🎤 startRecording: ファイルパス = $_currentFilePath');
 
     print('🎤 startRecording: 録音開始');
@@ -126,6 +128,17 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
 
     print('💾 saveRecording: recordingListProviderに追加');
     await ref.read(recordingListProvider.notifier).addRecording(recording);
+
+    print('💾 saveRecording: 音声分析開始');
+    final useCase = AnalyzeRecordingUseCase(AudioEventRepositoryImpl());
+    useCase.execute(recording.id, recording.filePath).then((_) {
+      print('💾 saveRecording: 音声分析完了');
+      useCase.dispose();
+    }).catchError((e) {
+      print('💾 saveRecording: 音声分析エラー = $e');
+      useCase.dispose();
+    });
+
     print('💾 saveRecording: 完了');
   }
 
