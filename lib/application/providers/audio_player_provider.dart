@@ -79,8 +79,10 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   }
 
   Future<void> resume() async {
+    print('🎵 AudioPlayerNotifier: resume() - position=${state.position}, duration=${state.duration}, isPlaying=${state.isPlaying}');
     // 再生完了状態の場合は最初から再生
     if (state.position >= state.duration && state.duration > Duration.zero) {
+      print('🎵 AudioPlayerNotifier: 再生完了状態のため seek(0) してから再生');
       await seek(Duration.zero);
     }
     await _repository.resume();

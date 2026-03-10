@@ -141,10 +141,13 @@ class RecordingButton extends ConsumerWidget {
     timerNotifier.stop();
 
     if (filePath == null) {
+      print('🔴 RecordingButton: filePath が null のためエラーダイアログを表示');
       _showErrorDialog(ref);
     } else {
+      print('🎵 RecordingButton: load() 開始 - filePath=$filePath');
       final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
       await audioPlayerNotifier.load(filePath);
+      print('🎵 RecordingButton: load() 完了 - duration=${ref.read(audioPlayerProvider).duration}');
     }
   }
 
