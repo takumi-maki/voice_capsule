@@ -5,7 +5,7 @@ import 'yamnet_classifier.dart';
 import 'package:uuid/uuid.dart';
 
 const int _sampleRate = 16000;
-const int _windowSamples = 15360; // 0.96秒 × 16000Hz
+const int _windowSamples = 15600; // モデルの実際の入力サイズ
 const double _scoreThreshold = 0.6;
 
 class AudioAnalyzer {
@@ -35,6 +35,10 @@ class AudioAnalyzer {
       offset += _windowSamples;
     }
 
+    print('🔍 分析結果: ${events.length}件検出');
+    for (final e in events) {
+      print('  → ${e.type.name} score:${e.score.toStringAsFixed(2)} at ${e.timestamp.toStringAsFixed(1)}s');
+    }
     return events;
   }
 

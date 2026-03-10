@@ -17,18 +17,30 @@ class YamnetClassifier {
 
   Future<void> load() async {
     _interpreter = await Interpreter.fromAsset('assets/models/yamnet.tflite');
+    _interpreter!.allocateTensors();
+
+    // デバッグ: テンソル形状確認
+    final inputTensor = _interpreter!.getInputTensor(0);
+    print('🧠 YAMNet input shape: ${inputTensor.shape}, type: ${inputTensor.type}');
+    for (var i = 0; i < _interpreter!.getOutputTensors().length; i++) {
+      final t = _interpreter!.getOutputTensor(i);
+      print('🧠 YAMNet output[$i] shape: ${t.shape}, type: ${t.type}');
+    }
   }
 
   // inputSamples: 16kHz mono PCM、長さ15360（0.96秒分）
   YamnetResult classify(List<double> inputSamples) {
     assert(_interpreter != null, 'YamnetClassifier.load() を先に呼ぶこと');
 
-    final input = [inputSamples];
-    final output = [List<double>.filled(_yamnetOutputSize, 0.0)];
+    // YAMNet TFLiteは複数出力（scores, embeddings, spectrogram）
+    final inputs = [inputSamples];
+    final outputs = <int, Object>{
+      0: [List<double>.filled(_yamnetOutputSize, 0.0)],
+    };
 
-    _interpreter!.run(input, output);
+    _interpreter!.runForMultipleInputs(inputs, outputs);
 
-    final scores = output[0];
+    final scores = (outputs[0]! as List<List<double>>)[0];
     return YamnetResult(
       laughterScore: scores[_laughterIndex],
       babyCryScore: scores[_babyCryIndex],
