@@ -17,6 +17,7 @@ class PlaybackScreen extends ConsumerStatefulWidget {
 class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
     with TickerProviderStateMixin {
   late AnimationController _waveformController;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -34,6 +35,9 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
       widget.recording.filePath,
       title: widget.recording.title,
     );
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -162,7 +166,7 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
 
   Widget _buildPlayButton(ThemeData theme, AudioPlayerState audioState) {
     return GestureDetector(
-      onTap: () => _togglePlayPause(audioState.isPlaying),
+      onTap: _isLoading ? null : () => _togglePlayPause(audioState.isPlaying),
       child: Container(
         width: 72,
         height: 72,

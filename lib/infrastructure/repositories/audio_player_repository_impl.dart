@@ -1,3 +1,4 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../domain/repositories/audio_player_repository.dart';
 
@@ -20,10 +21,31 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
     );
   }
 
+  // iOSの録音セッションからPlaybackセッションへ切り替える
+  Future<void> _configureAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.defaultToSpeaker,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        usage: AndroidAudioUsage.media,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+    await session.setActive(true);
+    print('🎵 AudioSession: Playbackモードに設定完了');
+  }
+
   @override
   Future<void> load(String filePath) async {
     print('🎵 AudioPlayer: ファイルロード開始 - $filePath');
     try {
+      await _configureAudioSession();
       final duration = await _player.setFilePath(filePath);
       print('🎵 AudioPlayer: ファイルロード完了 - duration=$duration');
       print('🎵 AudioPlayer: processingState=${_player.processingState}');
@@ -38,6 +60,7 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
   Future<void> play(String filePath, {String? title}) async {
     print('🎵 AudioPlayer: 再生開始 - $filePath');
     try {
+      await _configureAudioSession();
       final source = AudioSource.file(
         filePath,
         tag: {'id': filePath, 'title': title ?? 'VoiceCapsule'},
@@ -64,6 +87,7 @@ class AudioPlayerRepositoryImpl implements AudioPlayerRepository {
   Future<void> resume() async {
     print('🎵 AudioPlayer: resume() 呼び出し - processingState=${_player.processingState}, playing=${_player.playing}');
     try {
+      await _configureAudioSession();
       await _player.play();
       print('🎵 AudioPlayer: resume() 完了 - playing=${_player.playing}');
     } catch (e, st) {

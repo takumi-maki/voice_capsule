@@ -38,6 +38,7 @@ dependencies:
   # 音声
   record: ^6.2.0
   just_audio: ^0.9.40
+  audio_session: ^0.1.21
 
   # ファイル・パス
   path_provider: ^2.1.4
