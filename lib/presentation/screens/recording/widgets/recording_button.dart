@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
 import '../../../../application/providers/audio_player_provider.dart';
+import '../../../../application/providers/recording_analysis_provider.dart';
 
 class RecordingButton extends ConsumerWidget {
   const RecordingButton({super.key});
@@ -141,13 +142,13 @@ class RecordingButton extends ConsumerWidget {
     timerNotifier.stop();
 
     if (filePath == null) {
-      print('🔴 RecordingButton: filePath が null のためエラーダイアログを表示');
       _showErrorDialog(ref);
     } else {
-      print('🎵 RecordingButton: load() 開始 - filePath=$filePath');
       final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
       await audioPlayerNotifier.load(filePath);
-      print('🎵 RecordingButton: load() 完了 - duration=${ref.read(audioPlayerProvider).duration}');
+
+      // バックグラウンドで笑い声・泣き声を分析
+      ref.read(recordingAnalysisProvider.notifier).analyze(filePath);
     }
   }
 
