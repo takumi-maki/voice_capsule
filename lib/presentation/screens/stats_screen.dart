@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/stats_provider.dart';
+import 'stats/emotion_heatmap_screen.dart';
 import 'stats/widgets/today_emotion_card.dart';
 import 'stats/widgets/weekly_points_card.dart';
 import 'stats/widgets/streak_card.dart';
@@ -31,11 +32,10 @@ class StatsScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month_outlined),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Emotion Heatmap coming soon!')),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EmotionHeatmapScreen()),
+            ),
           ),
         ],
       ),
