@@ -248,6 +248,7 @@ class _SaveRecordingScreenState extends ConsumerState<SaveRecordingScreen> {
       duration: duration,
     );
     await recordingNotifier.resetRecording();
+    ref.read(recordingTimerProvider.notifier).reset();
 
     if (mounted) {
       ScaffoldMessenger.of(
