@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/child_profile_provider.dart';
 import '../../domain/entities/child.dart';
 import '../widgets/child_avatar.dart';
+import 'child_detail_screen.dart';
 import 'onboarding/child_profile_setup_screen.dart';
 
 class FamilyScreen extends ConsumerStatefulWidget {
@@ -68,8 +69,6 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
   }
 
   Widget _buildChildCard(Child child, ThemeData theme) {
-    final canDelete = _children.length > 1;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -93,27 +92,19 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
           child.name,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.edit_outlined,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-              onPressed: () => _editChild(child),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.delete_outline,
-                color: canDelete
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
-              ),
-              onPressed: canDelete ? () => _confirmDelete(child) : null,
-            ),
-          ],
+        trailing: Icon(
+          Icons.chevron_right,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChildDetailScreen(child: child),
+            ),
+          );
+          _loadChildren();
+        },
       ),
     );
   }
@@ -155,39 +146,4 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
     _loadChildren();
   }
 
-  Future<void> _editChild(Child child) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ChildProfileSetupScreen(child: child)),
-    );
-    _loadChildren();
-  }
-
-  Future<void> _confirmDelete(Child child) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${child.name}を削除'),
-        content: const Text('このプロフィールを削除しますか？録音データは残ります。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('削除'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await ref.read(childProfileProvider.notifier).deleteProfileById(child.id);
-      _loadChildren();
-    }
-  }
 }
