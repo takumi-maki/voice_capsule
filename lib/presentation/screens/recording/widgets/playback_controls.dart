@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/audio_player_provider.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
-import '../../save_recording_screen.dart';
+import '../../review_recording_screen.dart';
 
 class PlaybackControls extends ConsumerWidget {
   const PlaybackControls({super.key});
@@ -135,11 +135,11 @@ class PlaybackControls extends ConsumerWidget {
     print('💾 PlaybackControls: currentFilePath = $filePath');
 
     if (filePath != null) {
-      print('💾 PlaybackControls: SaveRecordingScreen に遷移');
+      print('💾 PlaybackControls: ReviewRecordingScreen に遷移');
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => SaveRecordingScreen(filePath: filePath),
+          builder: (_) => ReviewRecordingScreen(filePath: filePath),
         ),
       );
     } else {

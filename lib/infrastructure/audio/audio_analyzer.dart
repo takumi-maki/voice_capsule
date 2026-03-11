@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import '../../domain/entities/audio_event.dart';
 import 'yamnet_classifier.dart';
@@ -55,6 +56,31 @@ class AudioAnalyzer {
       timestamp: timestamp,
       score: score,
     );
+  }
+
+  // 音声ファイルから barCount 個の正規化済み振幅を抽出する
+  Future<List<double>> extractAmplitudes(String filePath, int barCount) async {
+    final samples = await _loadWavSamples(filePath);
+    if (samples.isEmpty || barCount <= 0) return List.filled(barCount, 0.0);
+
+    final chunkSize = (samples.length / barCount).ceil().clamp(1, samples.length);
+    final rmsValues = <double>[];
+
+    for (int i = 0; i < barCount; i++) {
+      final start = i * chunkSize;
+      final end = (start + chunkSize).clamp(0, samples.length);
+      if (start >= samples.length) {
+        rmsValues.add(0.0);
+        continue;
+      }
+      final chunk = samples.sublist(start, end);
+      final meanSquare = chunk.fold(0.0, (sum, s) => sum + s * s) / chunk.length;
+      rmsValues.add(sqrt(meanSquare));
+    }
+
+    final maxRms = rmsValues.reduce((a, b) => a > b ? a : b);
+    if (maxRms == 0) return List.filled(barCount, 0.0);
+    return rmsValues.map((v) => v / maxRms).toList();
   }
 
   // WAVファイルのPCMサンプルを[-1.0, 1.0]の範囲で読み込む
