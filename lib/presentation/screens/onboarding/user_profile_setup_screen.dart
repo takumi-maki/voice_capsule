@@ -53,22 +53,22 @@ class _UserProfileSetupScreenState
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 24),
-              Text(
-                widget.isEditing ? 'プロフィールを編集' : 'あなたのプロフィールを設定',
-                style: theme.textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.isEditing
-                    ? ''
-                    : 'VoiceCapsuleへようこそ。まずあなた自身のプロフィールを登録してください。',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              if (!widget.isEditing) ...[
+                Text(
+                  'あなたのプロフィールを設定',
+                  style: theme.textTheme.titleLarge,
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
+                const SizedBox(height: 8),
+                Text(
+                  'VoiceCapsuleへようこそ。まずあなた自身のプロフィールを登録してください。',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+              ],
               GestureDetector(
                 onTap: _showPhotoOptions,
                 child: _buildPhotoPreview(theme),
