@@ -21,6 +21,7 @@ class Recording {
   final BackgroundType location;
   final List<String> childIds;
   final int duration;
+  final List<double> waveformBars;
 
   Recording({
     required this.id,
@@ -30,7 +31,28 @@ class Recording {
     required this.location,
     required this.childIds,
     required this.duration,
+    this.waveformBars = const [],
   });
+
+  Recording copyWith({
+    String? id,
+    String? filePath,
+    DateTime? createdAt,
+    String? title,
+    BackgroundType? location,
+    List<String>? childIds,
+    int? duration,
+    List<double>? waveformBars,
+  }) => Recording(
+    id: id ?? this.id,
+    filePath: filePath ?? this.filePath,
+    createdAt: createdAt ?? this.createdAt,
+    title: title ?? this.title,
+    location: location ?? this.location,
+    childIds: childIds ?? this.childIds,
+    duration: duration ?? this.duration,
+    waveformBars: waveformBars ?? this.waveformBars,
+  );
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -40,6 +62,7 @@ class Recording {
     'location': location.name,
     'childIds': childIds,
     'duration': duration,
+    'waveformBars': waveformBars,
   };
 
   factory Recording.fromJson(Map<String, dynamic> json) {
@@ -61,6 +84,7 @@ class Recording {
       location: BackgroundType.values.byName(json['location']),
       childIds: ids,
       duration: json['duration'],
+      waveformBars: List<double>.from(json['waveformBars'] ?? []),
     );
   }
 }

@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../application/providers/audio_events_by_recording_provider.dart';
+import '../../application/providers/child_profile_provider.dart';
+import '../../domain/entities/audio_event.dart';
+import '../../domain/entities/child.dart';
 import '../../domain/entities/recording.dart';
 import '../screens/playback_screen.dart';
-import 'category_icon.dart';
 
 class RecordingCard extends ConsumerWidget {
   final Recording recording;
@@ -13,183 +17,230 @@ class RecordingCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final eventsAsync = ref.watch(audioEventsByRecordingProvider(recording.id));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: CategoryIcon(category: recording.location),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PlaybackScreen(recording: recording),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildThumbnail(theme),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          recording.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _formatDateTime(),
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () => _playRecording(ref),
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('Listen Now'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+        ),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(theme, eventsAsync),
+                const SizedBox(height: 8),
+                _ChildRow(childIds: recording.childIds),
+                const SizedBox(height: 8),
+                _buildEmojis(eventsAsync),
+                if (recording.waveformBars.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  _WaveformBars(bars: recording.waveformBars),
                 ],
-              ),
+                const SizedBox(height: 8),
+                _buildFooter(theme),
+              ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThumbnail(ThemeData theme) {
-    return Container(
-      height: 160,
-      decoration: BoxDecoration(
-        color: _getThumbnailColor(theme),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
         ),
       ),
-      child: Stack(
-        children: [
-          Center(
-            child: Icon(
-              _getCategoryIcon(),
-              size: 64,
-              color: Colors.white.withValues(alpha: 0.5),
-            ),
-          ),
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _getCategoryIcon(),
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _getCategoryLabel(),
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  Color _getThumbnailColor(ThemeData theme) {
-    switch (recording.location) {
-      case BackgroundType.house:
-        return Colors.teal[300]!;
-      case BackgroundType.car:
-        return Colors.blueGrey[400]!;
-      case BackgroundType.park:
-        return Colors.green[400]!;
-    }
+  Widget _buildHeader(ThemeData theme, AsyncValue<List<AudioEvent>> eventsAsync) {
+    final points = eventsAsync.valueOrNull?.length ?? 0;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          DateFormat('h:mm a').format(recording.createdAt),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '+$points pt',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  IconData _getCategoryIcon() {
-    switch (recording.location) {
-      case BackgroundType.house:
-        return Icons.home;
-      case BackgroundType.car:
-        return Icons.directions_car;
-      case BackgroundType.park:
-        return Icons.park;
-    }
+  Widget _buildEmojis(AsyncValue<List<AudioEvent>> eventsAsync) {
+    return eventsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (events) {
+        if (events.isEmpty) return const SizedBox.shrink();
+        return Wrap(
+          spacing: 2,
+          children: events
+              .map((e) => Text(
+                    e.type == EventType.laugh ? '😆' : '😭',
+                    style: const TextStyle(fontSize: 18),
+                  ))
+              .toList(),
+        );
+      },
+    );
   }
 
-  String _getCategoryLabel() {
-    switch (recording.location) {
-      case BackgroundType.house:
-        return 'HOME';
-      case BackgroundType.car:
-        return 'ON THE GO';
-      case BackgroundType.park:
-        return 'OUTDOOR';
-    }
-  }
-
-  String _formatDateTime() {
-    final date = DateFormat('MMM dd').format(recording.createdAt);
-    final time = DateFormat('h:mm a').format(recording.createdAt);
-    final duration = _formatDuration(recording.duration);
-    return '$date • $time • $duration';
+  Widget _buildFooter(ThemeData theme) {
+    return Row(
+      children: [
+        Text(
+          _formatDuration(recording.duration),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+        ),
+        const Spacer(),
+        Icon(
+          Icons.play_circle_outline,
+          color: theme.colorScheme.primary,
+          size: 28,
+        ),
+      ],
+    );
   }
 
   String _formatDuration(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
+}
 
-  Future<void> _playRecording(WidgetRef ref) async {
-    final context = ref.context;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => PlaybackScreen(recording: recording)),
+class _ChildRow extends ConsumerWidget {
+  final List<String> childIds;
+
+  const _ChildRow({required this.childIds});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return FutureBuilder<List<Child>>(
+      future: ref.read(childProfileProvider.notifier).getAllProfiles(),
+      builder: (context, snapshot) {
+        final allChildren = snapshot.data ?? [];
+        final children = childIds
+            .map((id) => allChildren.where((c) => c.id == id).firstOrNull)
+            .whereType<Child>()
+            .take(2)
+            .toList();
+
+        if (children.isEmpty) return const SizedBox.shrink();
+
+        return Row(
+          children: [
+            SizedBox(
+              width: children.length == 1 ? 24 : 36,
+              height: 24,
+              child: Stack(
+                children: [
+                  for (var i = 0; i < children.length; i++)
+                    Positioned(
+                      left: i * 16.0,
+                      child: _MiniAvatar(child: children[i], theme: theme),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              children.map((c) => c.name).join(', '),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _MiniAvatar extends StatelessWidget {
+  final Child child;
+  final ThemeData theme;
+
+  const _MiniAvatar({required this.child, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    if (child.photoPath != null && File(child.photoPath!).existsSync()) {
+      return CircleAvatar(
+        radius: 12,
+        backgroundImage: FileImage(File(child.photoPath!)),
+      );
+    }
+    return CircleAvatar(
+      radius: 12,
+      backgroundColor: theme.colorScheme.primary,
+      child: Text(
+        child.initials,
+        style: TextStyle(
+          color: theme.colorScheme.onPrimary,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _WaveformBars extends StatelessWidget {
+  final List<double> bars;
+
+  const _WaveformBars({required this.bars});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      height: 40,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: bars.map((amplitude) {
+          final height = (amplitude * 36).clamp(2.0, 36.0);
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.5),
+              child: Container(
+                height: height,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

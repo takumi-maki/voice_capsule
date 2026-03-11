@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../infrastructure/repositories/audio_recorder_repository_impl.dart';
 import '../../infrastructure/repositories/audio_event_repository_impl.dart';
+import '../../infrastructure/audio/audio_analyzer.dart';
+import '../../infrastructure/audio/yamnet_classifier.dart';
 import '../../application/usecases/analyze_recording_usecase.dart';
 import '../../domain/entities/recording.dart';
 import 'recording_list_provider.dart';
@@ -115,6 +117,15 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
       ids = [childProfile.id];
     }
 
+    List<double> waveformBars = [];
+    try {
+      final analyzer = AudioAnalyzer(YamnetClassifier());
+      waveformBars = await analyzer.extractAmplitudes(_currentFilePath!, 60);
+      print('💾 saveRecording: waveform抽出完了 (${waveformBars.length}bars)');
+    } catch (e) {
+      print('💾 saveRecording: waveform抽出エラー = $e');
+    }
+
     final recording = Recording(
       id: const Uuid().v4(),
       filePath: _currentFilePath!,
@@ -123,6 +134,7 @@ class RecordingNotifier extends StateNotifier<RecordingState> {
       location: location,
       childIds: ids,
       duration: duration,
+      waveformBars: waveformBars,
     );
     print('💾 saveRecording: Recording作成 = ${recording.id}');
 
