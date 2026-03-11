@@ -55,13 +55,6 @@ class _ChildProfileSetupScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 24),
-            Text(
-              widget.isEditing ? 'プロフィールを編集してください' : 'お子様の情報を登録してください',
-              style: theme.textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 48),
             GestureDetector(
               onTap: _showPhotoOptions,
               child: _buildPhotoPreview(theme),
