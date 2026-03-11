@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/child_profile_provider.dart';
-import '../../application/providers/active_child_provider.dart';
 import '../../domain/entities/child.dart';
 import '../widgets/child_avatar.dart';
 import 'onboarding/child_profile_setup_screen.dart';
@@ -16,7 +15,6 @@ class FamilyScreen extends ConsumerStatefulWidget {
 class _FamilyScreenState extends ConsumerState<FamilyScreen> {
   List<Child> _children = [];
   bool _isLoading = true;
-  String? _selectedChildId;
 
   @override
   void initState() {
@@ -25,13 +23,10 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
   }
 
   Future<void> _loadChildren() async {
-    final children = await ref
-        .read(childProfileProvider.notifier)
-        .getAllProfiles();
-    final activeChildId = ref.read(activeChildProvider);
+    final children =
+        await ref.read(childProfileProvider.notifier).getAllProfiles();
     setState(() {
       _children = children;
-      _selectedChildId = activeChildId;
       _isLoading = false;
     });
   }
@@ -60,143 +55,67 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
   }
 
   Widget _buildBody(ThemeData theme) {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                ..._children.map((child) => _buildChildCard(child, theme)),
-                const SizedBox(height: 16),
-                _buildAddChildButton(theme),
-                const SizedBox(height: 16),
-                Text(
-                  'Selecting a child will customize the VoiceCapsule experience and organize voice recordings for their specific profile.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-        _buildSaveButton(theme),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          ..._children.map((child) => _buildChildCard(child, theme)),
+          const SizedBox(height: 16),
+          _buildAddChildButton(theme),
+        ],
+      ),
     );
   }
 
   Widget _buildChildCard(Child child, ThemeData theme) {
-    final isActive = _selectedChildId == child.id;
     final canDelete = _children.length > 1;
 
-    return GestureDetector(
-      onTap: () => setState(() => _selectedChildId = child.id),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: isActive
-              ? Border.all(color: theme.colorScheme.primary, width: 1.5)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.shadow.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        leading: ChildAvatar(child: child, size: 48),
+        title: Text(
+          child.name,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.edit_outlined,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              onPressed: () => _editChild(child),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.delete_outline,
+                color: canDelete
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              ),
+              onPressed: canDelete ? () => _confirmDelete(child) : null,
             ),
           ],
         ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          leading: ChildAvatar(child: child, size: 48),
-          title: Text(
-            child.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          subtitle: Text(
-            isActive ? 'Active Profile' : 'Tap to select',
-            style: TextStyle(
-              color: isActive
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withValues(alpha: 0.4),
-              fontSize: 12,
-            ),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              isActive
-                  ? Icon(Icons.check_circle, color: theme.colorScheme.primary)
-                  : Icon(
-                      Icons.radio_button_unchecked,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                    ),
-              IconButton(
-                icon: Icon(
-                  Icons.edit_outlined,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                onPressed: () => _editChild(child),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: canDelete
-                      ? theme.colorScheme.error
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                ),
-                onPressed: canDelete ? () => _confirmDelete(child) : null,
-              ),
-            ],
-          ),
-        ),
       ),
     );
-  }
-
-  Widget _buildSaveButton(ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: _saveSelection,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
-          ),
-          child: const Text(
-            'Save Selection',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _saveSelection() async {
-    if (_selectedChildId != null) {
-      await ref
-          .read(activeChildProvider.notifier)
-          .setActiveChild(_selectedChildId!);
-    } else {
-      await ref.read(activeChildProvider.notifier).clearActiveChild();
-    }
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selection saved')),
-      );
-    }
   }
 
   Widget _buildAddChildButton(ThemeData theme) {
@@ -268,9 +187,6 @@ class _FamilyScreenState extends ConsumerState<FamilyScreen> {
 
     if (confirmed == true) {
       await ref.read(childProfileProvider.notifier).deleteProfileById(child.id);
-      if (child.id == ref.read(activeChildProvider)) {
-        await ref.read(activeChildProvider.notifier).clearActiveChild();
-      }
       _loadChildren();
     }
   }
