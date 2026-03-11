@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/audio_player_provider.dart';
-import '../../../../application/providers/recording_provider.dart';
-import '../../../../application/providers/recording_timer_provider.dart';
-import '../../review_recording_screen.dart';
 
 class PlaybackControls extends ConsumerWidget {
   const PlaybackControls({super.key});
@@ -12,45 +9,28 @@ class PlaybackControls extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final audioPlayerState = ref.watch(audioPlayerProvider);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Main playback controls
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildControlButton(
-              context,
-              icon: Icons.replay_10,
-              onTap: () =>
-                  ref.read(audioPlayerProvider.notifier).skipBackward(),
-            ),
-            const SizedBox(width: 32),
-            _buildLargePlayButton(
-              context,
-              isPlaying: audioPlayerState.isPlaying,
-              onTap: () => _togglePlayPause(ref, audioPlayerState.isPlaying),
-            ),
-            const SizedBox(width: 32),
-            _buildControlButton(
-              context,
-              icon: Icons.forward_10,
-              onTap: () => ref.read(audioPlayerProvider.notifier).skipForward(),
-            ),
-          ],
-        ),
-        const SizedBox(height: 32),
-        // Action buttons
-        _buildPrimaryButton(
+        _buildControlButton(
           context,
-          label: 'Save to Memories',
-          onTap: () => _saveRecording(context, ref),
+          icon: Icons.replay_10,
+          onTap: () => ref.read(audioPlayerProvider.notifier).skipBackward(),
         ),
-        const SizedBox(height: 12),
-        _buildSecondaryButton(
+        const SizedBox(width: 32),
+        _buildLargePlayButton(
           context,
-          label: 'Discard and Retry',
-          onTap: () => _retryRecording(context, ref),
+          isPlaying: audioPlayerState.isPlaying,
+          onTap: () {
+            final notifier = ref.read(audioPlayerProvider.notifier);
+            audioPlayerState.isPlaying ? notifier.pause() : notifier.resume();
+          },
+        ),
+        const SizedBox(width: 32),
+        _buildControlButton(
+          context,
+          icon: Icons.forward_10,
+          onTap: () => ref.read(audioPlayerProvider.notifier).skipForward(),
         ),
       ],
     );
@@ -111,128 +91,6 @@ class PlaybackControls extends ConsumerWidget {
           isPlaying ? Icons.pause : Icons.play_arrow,
           color: Colors.white,
           size: 36,
-        ),
-      ),
-    );
-  }
-
-  void _togglePlayPause(WidgetRef ref, bool isPlaying) {
-    print('▶️ PlaybackControls: 再生/一時停止ボタンタップ (isPlaying = $isPlaying)');
-    final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-    if (isPlaying) {
-      print('▶️ PlaybackControls: pause() 呼び出し');
-      audioPlayerNotifier.pause();
-    } else {
-      print('▶️ PlaybackControls: resume() 呼び出し');
-      audioPlayerNotifier.resume();
-    }
-  }
-
-  void _saveRecording(BuildContext context, WidgetRef ref) {
-    print('💾 PlaybackControls: 保存ボタンタップ');
-    final recordingNotifier = ref.read(recordingProvider.notifier);
-    final filePath = recordingNotifier.currentFilePath;
-    print('💾 PlaybackControls: currentFilePath = $filePath');
-
-    if (filePath != null) {
-      print('💾 PlaybackControls: ReviewRecordingScreen に遷移');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ReviewRecordingScreen(filePath: filePath),
-        ),
-      );
-    } else {
-      print('💾 PlaybackControls: filePath が null のため遷移しない');
-    }
-  }
-
-  void _retryRecording(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('録音をやり直しますか？'),
-        content: const Text('現在の録音が削除されます。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('やり直し'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
-      final recordingNotifier = ref.read(recordingProvider.notifier);
-      final timerNotifier = ref.read(recordingTimerProvider.notifier);
-
-      await audioPlayerNotifier.stop();
-      await recordingNotifier.resetRecording();
-      timerNotifier.reset();
-    }
-  }
-
-  Widget _buildPrimaryButton(
-    BuildContext context, {
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          elevation: 0,
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecondaryButton(
-    BuildContext context, {
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: theme.colorScheme.primary,
-          side: BorderSide(color: theme.colorScheme.primary, width: 2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w600,
-          ),
         ),
       ),
     );

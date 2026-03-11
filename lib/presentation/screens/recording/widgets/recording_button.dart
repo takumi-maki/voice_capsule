@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../application/providers/recording_provider.dart';
 import '../../../../application/providers/recording_timer_provider.dart';
 import '../../../../application/providers/audio_player_provider.dart';
-import '../../../../application/providers/recording_analysis_provider.dart';
+import '../../../../application/providers/review_recording_provider.dart';
 
 class RecordingButton extends ConsumerWidget {
   const RecordingButton({super.key});
@@ -115,6 +115,7 @@ class RecordingButton extends ConsumerWidget {
   }
 
   void _startRecording(WidgetRef ref) async {
+    ref.read(reviewRecordingProvider.notifier).reset();
     final recordingNotifier = ref.read(recordingProvider.notifier);
     final timerNotifier = ref.read(recordingTimerProvider.notifier);
     await recordingNotifier.startRecording();
@@ -147,8 +148,7 @@ class RecordingButton extends ConsumerWidget {
       final audioPlayerNotifier = ref.read(audioPlayerProvider.notifier);
       await audioPlayerNotifier.load(filePath);
 
-      // バックグラウンドで笑い声・泣き声を分析
-      ref.read(recordingAnalysisProvider.notifier).analyze(filePath);
+      ref.read(reviewRecordingProvider.notifier).initAnalysis(filePath);
     }
   }
 
