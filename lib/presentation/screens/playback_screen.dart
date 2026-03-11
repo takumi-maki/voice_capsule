@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/audio_player_provider.dart';
 import '../../application/providers/recording_list_provider.dart';
+import '../../application/providers/recording_playback_provider.dart';
 import '../../domain/entities/recording.dart';
 import 'recording/widgets/playback_progress_bar.dart';
+import 'review_recording/widgets/emotion_waveform.dart';
+import 'review_recording/widgets/emotion_points_card.dart';
 
 class PlaybackScreen extends ConsumerStatefulWidget {
   final Recording recording;
@@ -14,20 +17,30 @@ class PlaybackScreen extends ConsumerStatefulWidget {
   ConsumerState<PlaybackScreen> createState() => _PlaybackScreenState();
 }
 
-class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _waveformController;
+class _PlaybackScreenState extends ConsumerState<PlaybackScreen> {
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _waveformController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
     _loadAndPlay();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final barCount = _calcBarCount();
+      ref.read(recordingPlaybackProvider.notifier).load(
+        widget.recording.id,
+        widget.recording.filePath,
+        barCount: barCount,
+      );
+    });
   }
+
+  int _calcBarCount() {
+    final secs = widget.recording.duration;
+    if (secs <= 60) return 60;
+    return secs.clamp(60, 300);
+  }
+
+  bool get _isScrollable => widget.recording.duration > 60;
 
   Future<void> _loadAndPlay() async {
     final notifier = ref.read(audioPlayerProvider.notifier);
@@ -41,23 +54,10 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
   }
 
   @override
-  void dispose() {
-    _waveformController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final audioState = ref.watch(audioPlayerProvider);
+    final playbackState = ref.watch(recordingPlaybackProvider);
     final theme = Theme.of(context);
-
-    ref.listen(audioPlayerProvider, (previous, next) {
-      if (next.isPlaying) {
-        _waveformController.repeat();
-      } else {
-        _waveformController.stop();
-      }
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -67,17 +67,28 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 24),
-            _buildWaveform(theme, audioState),
+            _buildHeader(theme),
             const SizedBox(height: 24),
-            const PlaybackProgressBar(),
+            EmotionWaveform(
+              bars: playbackState.waveformBars,
+              events: playbackState.events,
+              duration: audioState.duration,
+              isAnalyzing: playbackState.isLoading,
+              scrollable: _isScrollable,
+            ),
             const SizedBox(height: 24),
             _buildPlaybackControls(theme, audioState),
-            const Spacer(),
+            const SizedBox(height: 16),
+            const PlaybackProgressBar(),
+            const SizedBox(height: 24),
+            EmotionPointsCard(points: playbackState.events.length),
+            const SizedBox(height: 24),
             _buildActionButtons(theme),
             const SizedBox(height: 24),
           ],
@@ -86,34 +97,24 @@ class _PlaybackScreenState extends ConsumerState<PlaybackScreen>
     );
   }
 
-  Widget _buildWaveform(ThemeData theme, AudioPlayerState audioState) {
-    return SizedBox(
-      height: 60,
-      child: AnimatedBuilder(
-        animation: _waveformController,
-        builder: (context, child) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              final delay = index * 0.2;
-              final value = (_waveformController.value + delay) % 1.0;
-              final height = audioState.isPlaying
-                  ? 20 + (40 * (0.5 + 0.5 * (value * 2 - 1).abs()))
-                  : 20.0;
-
-              return Container(
-                width: 4,
-                height: height,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              );
-            }),
-          );
-        },
-      ),
+  Widget _buildHeader(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'EMOTION DETECTION',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "We've mapped your feelings",
+          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+        ),
+      ],
     );
   }
 

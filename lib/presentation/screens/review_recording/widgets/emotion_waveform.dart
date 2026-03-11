@@ -6,6 +6,7 @@ class EmotionWaveform extends StatelessWidget {
   final List<AudioEvent> events;
   final Duration duration;
   final bool isAnalyzing;
+  final bool scrollable;
 
   const EmotionWaveform({
     super.key,
@@ -13,6 +14,7 @@ class EmotionWaveform extends StatelessWidget {
     required this.events,
     required this.duration,
     required this.isAnalyzing,
+    this.scrollable = false,
   });
 
   @override
@@ -35,7 +37,9 @@ class EmotionWaveform extends StatelessWidget {
       ),
       child: isAnalyzing
           ? _buildLoading(theme)
-          : _buildContent(context, theme),
+          : scrollable
+              ? _buildScrollableContent(theme)
+              : _buildFixedContent(context, theme),
     );
   }
 
@@ -62,22 +66,37 @@ class EmotionWaveform extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, ThemeData theme) {
+  Widget _buildScrollableContent(ThemeData theme) {
+    if (bars.isEmpty) return const SizedBox(height: 130);
+
+    final totalWidth = bars.length * 5.0;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: _buildWaveformStack(theme, totalWidth),
+    );
+  }
+
+  Widget _buildFixedContent(BuildContext context, ThemeData theme) {
     if (bars.isEmpty) return const SizedBox(height: 130);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        return SizedBox(
-          height: 130,
-          child: Stack(
-            children: [
-              _buildBars(theme, width),
-              ..._buildMarkers(theme, width),
-            ],
-          ),
-        );
+        return _buildWaveformStack(theme, width);
       },
+    );
+  }
+
+  SizedBox _buildWaveformStack(ThemeData theme, double totalWidth) {
+    return SizedBox(
+      width: totalWidth,
+      height: 130,
+      child: Stack(
+        children: [
+          _buildBars(theme, totalWidth),
+          ..._buildMarkers(theme, totalWidth),
+        ],
+      ),
     );
   }
 
@@ -87,7 +106,7 @@ class EmotionWaveform extends StatelessWidget {
 
     return Positioned(
       left: 0,
-      right: 0,
+      right: scrollable ? null : 0,
       bottom: 0,
       height: barsHeight,
       child: Row(
@@ -95,16 +114,26 @@ class EmotionWaveform extends StatelessWidget {
         children: List.generate(bars.length, (i) {
           final h = (bars[i] * 56 + 4).clamp(4.0, 60.0);
           final isEvent = eventBarIndices.contains(i);
+          final barDecoration = BoxDecoration(
+            color: isEvent
+                ? theme.colorScheme.primary
+                : theme.colorScheme.primary.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(2),
+          );
+
+          if (scrollable) {
+            return Container(
+              width: 4.0,
+              height: h,
+              margin: const EdgeInsets.symmetric(horizontal: 0.5),
+              decoration: barDecoration,
+            );
+          }
           return Expanded(
             child: Container(
               height: h,
               margin: const EdgeInsets.symmetric(horizontal: 0.5),
-              decoration: BoxDecoration(
-                color: isEvent
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.primary.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: barDecoration,
             ),
           );
         }),
