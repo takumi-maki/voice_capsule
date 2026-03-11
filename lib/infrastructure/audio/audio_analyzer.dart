@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 
 const int _sampleRate = 16000;
 const int _windowSamples = 15600; // モデルの実際の入力サイズ
-const double _scoreThreshold = 0.6;
+const double _scoreThreshold = 0.4;
 
 class AudioAnalyzer {
   final YamnetClassifier _classifier;
