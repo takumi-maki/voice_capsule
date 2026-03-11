@@ -5,8 +5,8 @@ import '../../application/providers/audio_player_provider.dart';
 import '../../application/providers/recording_timer_provider.dart';
 import 'recording_screen.dart';
 import 'timeline_screen.dart';
-import 'family_screen.dart';
 import 'settings_screen.dart';
+import 'stats_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   final int initialIndex;
@@ -36,7 +36,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         children: const [
           TimelineScreen(),
           RecordingScreen(),
-          FamilyScreen(),
+          StatsScreen(),
           SettingsScreen(),
         ],
       ),
@@ -48,20 +48,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.mic_outlined),
+            icon: Icon(Icons.library_music_outlined),
             label: 'Capsules',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            label: 'Family',
+            icon: Icon(Icons.mic_outlined),
+            label: 'Record',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
+            icon: Icon(Icons.bar_chart_outlined),
+            label: 'Stats',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
           ),
         ],
       ),
