@@ -93,7 +93,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   Widget _buildList(BuildContext context, List<Recording> recordings) {
     if (recordings.isEmpty) {
       final message = _selectedChildIds.length < _children.length
-          ? 'この子供の録音はまだありません'
+          ? '音声がありません'
           : 'まだ録音がありません';
       return Column(
         children: [
